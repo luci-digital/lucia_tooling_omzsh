@@ -94,9 +94,61 @@ The app uses `@tanstack/react-start` which targets Node.js by default. To deploy
 
 ---
 
+---
+
+## Luciverse Template
+
+This app is a full-stack TanStack Start template wired to the `lua-substrate` backend.
+
+### What's wired
+
+| Layer | File | What it does |
+|---|---|---|
+| Server functions | `src/functions/luciverse.ts` | `getSubstrateStatus`, `listAgents`, `chatWithAgent`, `getSignalBusStatus` — fetch from oasis-core HTTP |
+| SSE stream | `src/routes/api/signal/stream.ts` | Subscribes to Redis `luci:signal:broadcast` via `redis-cli`, streams SSE to browser |
+| Dashboard | `src/routes/index.tsx` | Genesis Bond status, module grid, signal feed, tier matrix |
+| Agents | `src/routes/agents.tsx` | Agent selector + live chat panel per oasis-core agent |
+| Signal monitor | `src/routes/signal.tsx` | Full signal feed + bus config + signal type reference |
+| Types | `src/lib/luciverse.ts` | Tier frequencies, signal types, interfaces matching lua-substrate |
+
+### Environment variables (see `.env.example`)
+
+| Var | Default | Purpose |
+|---|---|---|
+| `OASIS_ENDPOINT` | `http://localhost:8742` | oasis-core agent HTTP base |
+| `LUCIVERSE_PAC_URL` | `http://localhost:8741` | PAC tier (741 Hz) |
+| `LUCIVERSE_COMN_URL` | `http://localhost:8742` | COMN tier (528 Hz) |
+| `LUCIVERSE_CORE_URL` | `http://localhost:8743` | CORE tier (432 Hz) |
+| `REDIS_HOST` / `REDIS_PORT` | `127.0.0.1:6379` | Signal bus Redis |
+| `SIGNAL_CHANNEL` | `luci:signal` | Channel prefix (matches bus.lua) |
+| `LUCIVERSE_TIER` | `PAC` | This node's tier |
+| `LUCIVERSE_FREQUENCY` | `741` | This node's frequency |
+| `LUCIVERSE_COHERENCE` | `0.85` | Coherence (must be ≥ 0.7) |
+
+### Backend expectations
+
+The server functions degrade gracefully — when the Lua backend is unreachable they return stubs so the UI always renders. Wire the real backend by:
+
+1. Starting the oasis-core HTTP service (runs via `lucia kernel-up` or `lucia endpoint-up`)
+2. Implementing these endpoints on the Lua side:
+   - `GET /status` → `SubstrateStatus` JSON
+   - `GET /agents` → `AgentProfile[]` JSON
+   - `POST /agents/:id/chat` body `{messages}` → `ChatResponse` JSON
+3. Ensure Redis is running and `signal/bus.lua` is publishing to `luci:signal:broadcast`
+
+### Luciverse architecture (from lua-substrate)
+
+```
+PAC (741 Hz) → COMN (528 Hz) → CORE (432 Hz)
+Push-only. Pull forbidden. Coherence ≥ 0.7.
+```
+
+Data flows through the 5-stage Data Juicer: fill → filter → extract → verify → release.
+
 ### Next Steps
 
-1. Run `pnpm install` to install dependencies via pnpm.
-2. Run `pnpm dev` to verify the dev server starts and `routeTree.gen.ts` is generated.
-3. Replace placeholder content in `src/routes/index.tsx` and `src/components/Footer.tsx`.
-4. Add new routes as `.tsx` files under `src/routes/`.
+1. Copy `.env.example` to `.env` and configure endpoints.
+2. Run `pnpm dev` — dashboard loads with stub data if backend is offline.
+3. Start the Lua substrate (`lucia kernel-up`, `lucia endpoint-up`).
+4. Implement the 3 oasis-core HTTP endpoints listed above.
+5. Verify the signal feed goes live once Redis is running and `signal/bus.lua` is publishing.
