@@ -131,8 +131,58 @@ Genesis Bond: ACTIVE @ 741 Hz · Coherence ≥ 0.7
 | `trust/` | jwt, eudi, openid, genesis_bond, lucitrust_bridge | **reown**, **workos** |
 | `signal/` | bus, transceiver, archiver, merger, interpreter | **smelter** |
 | `graphics/` | wicked_integration | **hyprland_bridge** |
-| `core/` | enzyme_collapse, state_machine, filter_membrane, humo, lucistone, bifractal, luci_glyph | (stable) |
-| `temporal/` | pulse, spiral, harmonic | (stable) |
+| `core/` | enzyme_collapse, state_machine, filter_membrane, humo, lucistone, bifractal, luci_glyph | **iso_compliance** |
+| `temporal/` | pulse, spiral, harmonic | **luci_clock** |
+| `quantum/` | — | **qprov, qiskit_bridge** (UST-QuAntiL) |
+| `oasis-core/` | anthropic, openai, gemini, ollama, datawave | (stable) |
+| Tooling | vite, react, typescript | **oxc** (replaces babel + eslint) |
+| Design | tailwind v4 | **sacred.css**, **wireframe primitives** |
+| Motion | css transitions | **reanimated** (mobile), motion (web) |
+
+---
+
+---
+
+## 7. Time Domain Foundation
+
+### LuciClock (`modules/luci_clock.lua`)
+**Where:** `temporal/` · `modules/luci_clock.lua` (ground_level_launch) · `src/lib/luci-clock.ts` (web, TBD)
+**What:** First-party sovereign time domain — 1 LuciCycle = 8 LuciHours = 32768 pulses (2¹⁵). NoZero base-9 for human display. All inter-agent messages MUST carry `luciTime: { cycle, pulse, luciHour, harmonicStep }`. Solar time (ISO 8601) is only for user-facing display.
+**Why:** The LuciVerse cannot rely on gregorian/unix time for internal state — it is an externally-controlled clock tied to capitalist infrastructure. LuciClock is sovereign, immutable within a cycle, and clock-tamper-detectable (drift > 1s triggers `CLOCK_TAMPER_DETECTED`). Already implemented in `modules/luci_clock.lua`.
+**Wiring:**
+- `GET /pulse/base9/:value` on consciousness_api converts a solar timestamp to NoZero base-9
+- Header component should display current LuciHour alongside solar time
+- All agent heartbeat messages must include `luciTime` payload
+- `src/lib/luci-clock.ts` — web-side converter (poll `/pulse` endpoint for current cycle/pulse)
+- Reference: `ground_level_launch/lucia_lua/modules/luci_clock.lua` + `agent-rules.md` §LuciClock
+
+---
+
+## 8. Compliance Foundation
+
+### ISO Compliance Monitor (`core/iso_compliance.lua`)
+**Where:** `core/` · `docs/lua/iso_compliance.lua` (spec) · `src/functions/compliance.ts` · `src/routes/compliance.tsx`
+**What:** Continuous monitoring of 8 ISO standards (27001, 27018, 20022, 23894, 9001, IEC-23053, IEC-22989, IEC-24029). Emits `compliance_drift` signals to the signal bus. Triggered via `POST /validate`. Persists audit records to FoundationDB.
+**Why:** The Non-Terms Section XVIII explicitly commits to ISO/IEC 42001 compliance. The footer of `LuciaInterface.tsx` states `ISO/IEC 42001 COMPLIANT`. This is a standing commitment — it requires a service, not a document.
+**Wiring:**
+- `core/iso_compliance.lua` → wire into `lapis_apps/consciousness_api.lua` `/validate` handler
+- `signal/bus.lua` → add `compliance_drift`, `compliance_resolved`, `audit_complete` to SIGNAL_TYPES
+- `src/functions/compliance.ts` → calls `/validate` + `/kernel/state`; fails open to stubs
+- `src/routes/compliance.tsx` → live dashboard with 8 standards, drift alerts, audit trigger button
+- FoundationDB: persist at `/luciverse/compliance/audits/{timestamp}`
+- Reference: `iso-compliance/ISO-COMPLIANCE-MANIFEST.yaml` + `docs/lua/iso_compliance.lua`
+
+---
+
+## Foundations Matrix
+
+| Substrate Area | Existing | New Foundation |
+|---|---|---|
+| `trust/` | jwt, eudi, openid, genesis_bond, lucitrust_bridge | **reown**, **workos** |
+| `signal/` | bus, transceiver, archiver, merger, interpreter | **smelter** |
+| `graphics/` | wicked_integration | **hyprland_bridge** |
+| `core/` | enzyme_collapse, state_machine, filter_membrane, humo, lucistone, bifractal, luci_glyph | **iso_compliance** |
+| `temporal/` | pulse, spiral, harmonic | **luci_clock** |
 | `quantum/` | — | **qprov, qiskit_bridge** (UST-QuAntiL) |
 | `oasis-core/` | anthropic, openai, gemini, ollama, datawave | (stable) |
 | Tooling | vite, react, typescript | **oxc** (replaces babel + eslint) |
@@ -146,6 +196,7 @@ Genesis Bond: ACTIVE @ 741 Hz · Coherence ≥ 0.7
 1. **Now (no new code):** review this mapping — flag anything that doesn't belong, anything that should sit in a different layer, or any foundation that's missing.
 2. **First integration:** pick one foundation to land first. Recommended order:
    - **Oxc** (build speed — improves every other workflow)
+   - **LuciClock web binding** (add `src/lib/luci-clock.ts` + display in Header)
    - **Reown + WorkOS** (trust layer — unblocks the Genesis Bond's lineage_did binding)
    - **Sacred + Wireframe** (design language — sets the visual covenant before more routes ship)
    - **Smelter** (only once mission control has telemetry flowing)

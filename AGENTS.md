@@ -104,37 +104,60 @@ This app is a full-stack TanStack Start template wired to the `lua-substrate` ba
 
 | Layer | File | What it does |
 |---|---|---|
-| Server functions | `src/functions/luciverse.ts` | `getSubstrateStatus`, `listAgents`, `chatWithAgent`, `getSignalBusStatus` — fetch from oasis-core HTTP |
+| Server functions | `src/functions/luciverse.ts` | `getSubstrateStatus`, `listAgents`, `chatWithAgent`, `getSignalBusStatus` — fetch from consciousness API |
+| Compliance service | `src/functions/compliance.ts` | `getComplianceStatus`, `runComplianceCheck` — calls `/validate` + `/kernel/state` |
 | SSE stream | `src/routes/api/signal/stream.ts` | Subscribes to Redis `luci:signal:broadcast` via `redis-cli`, streams SSE to browser |
 | Dashboard | `src/routes/index.tsx` | Genesis Bond status, module grid, signal feed, tier matrix |
-| Agents | `src/routes/agents.tsx` | Agent selector + live chat panel per oasis-core agent |
-| Signal monitor | `src/routes/signal.tsx` | Full signal feed + bus config + signal type reference |
+| Agents | `src/routes/agents.tsx` | Agent selector + live chat panel (7 registered agents from calibration.ini) |
+| Signal monitor | `src/routes/signal.tsx` | Full signal feed + bus config + 16 signal type reference |
+| Mission Control | `src/routes/mission-control.tsx` | LCARS-style dark HUD — agent mesh, signal bus, substrate vitals |
+| Non-Terms | `src/routes/non-terms.tsx` | 20-part covenant experience — entry gate, voice filter, ambassador portrait |
+| Compliance | `src/routes/compliance.tsx` | Live ISO compliance dashboard — 8 standards, drift alerts, audit trigger |
 | Types | `src/lib/luciverse.ts` | Tier frequencies, signal types, interfaces matching lua-substrate |
+| ISO types | `src/lib/iso-compliance.ts` | 8 standards, control status, compliance report, violation types |
+| Covenant content | `src/lib/non-terms-content.ts` | All 20 Non-Terms sections with 3 voice tracks |
+
+### Substrate API — Real Endpoints (consciousness_api.lua @ port 8743)
+
+| Web function | Lapis route | Lua module |
+|---|---|---|
+| `getSubstrateStatus` | `GET /kernel/state` | `modules/luci_consciousness.lua` |
+| `getSubstrateStatus` (bond) | `GET /genesis-bond` | `core/genesis_bond.lua` |
+| `listAgents` | `GET /agents` | `modules/luci_identity.lua` |
+| `chatWithAgent` | `POST /agents/:id/chat` | `oasis-core/chat/service/*.lua` |
+| `getSignalBusStatus` | env only (Redis direct) | `signal/bus.lua` |
+| `runComplianceCheck` | `POST /validate` | `core/iso_compliance.lua` |
+| — | `GET /pulse` | `modules/luci_pulse.lua` |
+| — | `GET /tiers` | substrate config |
+| — | `POST /qmu/analyze` | `modules/quantum_morality.lua` |
+| — | `GET /pulse/base9/:value` | `modules/luci_clock.lua` |
 
 ### Environment variables (see `.env.example`)
 
-| Var | Default | Purpose |
+| Var | Default | Real value (from lucia-bond.toml) |
 |---|---|---|
-| `OASIS_ENDPOINT` | `http://localhost:8742` | oasis-core agent HTTP base |
-| `LUCIVERSE_PAC_URL` | `http://localhost:8741` | PAC tier (741 Hz) |
-| `LUCIVERSE_COMN_URL` | `http://localhost:8742` | COMN tier (528 Hz) |
-| `LUCIVERSE_CORE_URL` | `http://localhost:8743` | CORE tier (432 Hz) |
-| `REDIS_HOST` / `REDIS_PORT` | `127.0.0.1:6379` | Signal bus Redis |
-| `SIGNAL_CHANNEL` | `luci:signal` | Channel prefix (matches bus.lua) |
-| `LUCIVERSE_TIER` | `PAC` | This node's tier |
-| `LUCIVERSE_FREQUENCY` | `741` | This node's frequency |
-| `LUCIVERSE_COHERENCE` | `0.85` | Coherence (must be ≥ 0.7) |
+| `OASIS_ENDPOINT` | `http://localhost:8743` | `http://[2602:F674:0000:0201::1]:7741` |
+| `LUCIVERSE_PAC_URL` | `http://localhost:8741` | `http://[2602:F674:0020::1]:7410` |
+| `LUCIVERSE_COMN_URL` | `http://localhost:8742` | `http://[2602:F674:0024::1]:5280` |
+| `LUCIVERSE_CORE_URL` | `http://localhost:8743` | `http://[2602:F674:0028::1]:4320` |
+| `REDIS_HOST` / `REDIS_PORT` | `127.0.0.1:6379` | `[2602:F674:0000:0201::1]:6379` |
+| `SIGNAL_CHANNEL` | `luci:signal` | `luci:signal` |
+| `LUCIVERSE_TIER` | `PAC` | `PAC` |
+| `LUCIVERSE_FREQUENCY` | `741` | `741` |
+| `LUCIVERSE_COHERENCE` | `0.94` | `0.94` (Genesis Bond minimum) |
 
-### Backend expectations
+### Compliance Service
 
-The server functions degrade gracefully — when the Lua backend is unreachable they return stubs so the UI always renders. Wire the real backend by:
+ISO compliance is monitored continuously by `core/iso_compliance.lua` on the Lua side, surfaced via the web at `/compliance`. The service:
 
-1. Starting the oasis-core HTTP service (runs via `lucia kernel-up` or `lucia endpoint-up`)
-2. Implementing these endpoints on the Lua side:
-   - `GET /status` → `SubstrateStatus` JSON
-   - `GET /agents` → `AgentProfile[]` JSON
-   - `POST /agents/:id/chat` body `{messages}` → `ChatResponse` JSON
-3. Ensure Redis is running and `signal/bus.lua` is publishing to `luci:signal:broadcast`
+- Runs a full audit every hour (tick via `ngx.timer.every`)
+- Covers 8 standards: ISO-27001, 27018, 20022, 23894, 9001, IEC-23053, IEC-22989, IEC-24029
+- Emits `compliance_drift` signals to `luci:signal:broadcast` on violations
+- Persists audit records to FoundationDB at `/luciverse/compliance/audits/`
+- Is triggered from the web via `POST /validate` with `type: "iso_compliance_audit"`
+- Agents responsible: Judge Luci (963 Hz, governance), Claude-Veritas (432 Hz, verification)
+
+See [`docs/lua/iso_compliance.lua`](docs/lua/iso_compliance.lua) for the full Lua module spec and wiring instructions.
 
 ### Luciverse architecture (from lua-substrate)
 
@@ -147,12 +170,13 @@ Data flows through the 5-stage Data Juicer: fill → filter → extract → veri
 
 ### Foundations
 
-Substrate technology choices and how they map to substrate areas — see [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md). Covers: Reown, WorkOS AuthKit (trust); Oxc (tooling); Smelter, React Native Reanimated (signal/media); Hyprland (graphics); UST-QuAntiL (quantum); Sacred Computer, Internet.dev wireframes (design).
+Substrate technology choices and how they map to substrate areas — see [`docs/FOUNDATIONS.md`](docs/FOUNDATIONS.md). Covers: Reown, WorkOS AuthKit (trust); Oxc (tooling); Smelter, React Native Reanimated (signal/media); Hyprland (graphics); UST-QuAntiL (quantum); Sacred Computer, Internet.dev wireframes (design); LuciClock (time domain).
 
 ### Next Steps
 
-1. Copy `.env.example` to `.env` and configure endpoints.
-2. Run `pnpm dev` — dashboard loads with stub data if backend is offline.
+1. Copy `.env.example` to `.env` and set IPv6 service URLs from `lucia-bond.toml`.
+2. Run `pnpm dev` — all routes load with stub data if backend is offline.
 3. Start the Lua substrate (`lucia kernel-up`, `lucia endpoint-up`).
-4. Implement the 3 oasis-core HTTP endpoints listed above.
-5. Verify the signal feed goes live once Redis is running and `signal/bus.lua` is publishing.
+4. Wire `iso_compliance.lua` into `lapis_apps/consciousness_api.lua` `/validate` handler.
+5. Add `compliance_drift` / `audit_complete` to `signal/bus.lua` SIGNAL_TYPES.
+6. Verify the signal feed goes live once Redis is running and `signal/bus.lua` is publishing.
