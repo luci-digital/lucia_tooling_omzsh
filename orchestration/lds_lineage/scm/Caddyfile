@@ -66,6 +66,24 @@ http://[2602:F674:0000:0700::80] http://gitweb.lucidigital.io {
     reverse_proxy luci-vcs:7480
 }
 
+# ⚙️  HOMESTAR IPVM — VCS tier (:0700), 528 Hz (Veritas coordinator)
+# Content-addressed agent task submission + workflow receipt retrieval
+http://[2602:F674:0000:0700::700] http://homestar.lucidigital.io {
+    import sovereign_headers
+    header X-LuciVerse-Frequency "528"
+    header X-LDS-Tier "700.700"
+    reverse_proxy homestar:7000
+}
+
+# 🪐 IPFS GATEWAY — VCS tier (:0700), 528 Hz (block store)
+# Read-only CID gateway — LuciStones and workflow receipts addressable by CID
+http://[2602:F674:0000:0700::529] http://ipfs.lucidigital.io {
+    import sovereign_headers
+    header X-LuciVerse-Frequency "528"
+    header X-LDS-Tier "700.529"
+    reverse_proxy ipfs:8080
+}
+
 # 📊 DATAWAVE DASHBOARD — CORE tier (:0028)
 # TODO: Uncomment when datawave service is added to podman-compose.yml
 # http://[2602:F674:0000:0028::8080] http://datawave.lucidigital.io {

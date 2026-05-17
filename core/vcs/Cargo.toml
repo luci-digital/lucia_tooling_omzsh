@@ -26,13 +26,32 @@ hyper-util = { version = "0.1", features = ["tokio"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["fs", "trace"] }
 
-# Content-addressable block cache (XetHub-style)
+# ── XET content-addressable storage (xet-core, Apache-2.0) ───────────────────
+# Replaces hand-rolled block_cache — production CDC chunking + MerkleHash CAS.
+# Ref: https://github.com/huggingface/xet-core
+# xet-data owns chunking/dedup; xet-client owns the HTTP CAS backend.
+xet-data = { git = "https://github.com/huggingface/xet-core", optional = true }
+xet-client = { git = "https://github.com/huggingface/xet-core", optional = true }
+
+# ── IPFS / IPLD ───────────────────────────────────────────────────────────────
+# CID for content-addressing blocks (wraps any multihash as an IPFS CID).
+# libipld for IPLD DAG codec (DAG-CBOR, DAG-JSON).
+cid = { version = "0.11", optional = true }
+libipld = { version = "0.16", optional = true }
+
+# ── IPVM Workflow ─────────────────────────────────────────────────────────────
+# Agent task DAGs: each task has CID-addressed inputs → reproducible, auditable.
+# Ref: https://github.com/ipvm-wg/workflow
+homestar-workflow = { version = "0.3", optional = true }
+homestar-invocation = { version = "0.3", optional = true }  # UCAN auth
+
+# ── Fallback CAS (used when xet feature is off) ───────────────────────────────
 blake3 = "1.5"        # CAS hashing — 256-bit, parallel
 zstd = "0.13"         # Block compression
 memmap2 = "0.9"       # mmap for cold blocks
 
 # Tracing / observability — tokio.rs/tokio/topics/tracing
-tracing = { version = "0.1", features = ["attributes"] }   # enables #[instrument]
+tracing = { version = "0.1", features = ["attributes"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "ansi"] }
 
 # Serialization
@@ -43,6 +62,7 @@ toml = "0.8"
 # Error handling
 thiserror = "2"
 anyhow = "1"
+hex = "0.4"
 
 # IPv6 address parsing for the sovereign schema
 ipnet = "2"
@@ -58,5 +78,11 @@ path = "src/bin/main.rs"
 [features]
 default = ["block-cache", "jj-bridge", "gitweb"]
 block-cache = []
-jj-bridge = []          # Shells out to `jj` binary; enable if jj-lib API stabilizes
+jj-bridge = []
 gitweb = []
+# Enable xet-core backed CAS (production chunking + MerkleHash)
+xet = ["dep:xet-data", "dep:xet-client"]
+# Enable IPFS/IPLD block addressing (CID output from block_cache)
+ipfs = ["dep:cid", "dep:libipld"]
+# Enable IPVM agent workflow generation (requires ipfs)
+ipvm = ["dep:homestar-workflow", "dep:homestar-invocation", "ipfs"]

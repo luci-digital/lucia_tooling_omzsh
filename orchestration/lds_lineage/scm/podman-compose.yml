@@ -256,6 +256,68 @@ services:
       retries: 3
       start_period: 30s
 
+  # ---------------------------------------------------------------------
+  # 10) HOMESTAR: IPVM compute node — content-addressed Wasm task execution
+  # Agent workflows (IPVM DAGs) run here; inputs/outputs are CID-addressed.
+  # Pairs with XET block store for large blob inputs (LuciStones, models).
+  # Ref: https://github.com/ipvm-wg/homestar
+  # IPv6: 2602:F674:0000:0700::700 (VCS coordinator, LDS 700.700)
+  # ---------------------------------------------------------------------
+  homestar:
+    image: ghcr.io/ipvm-wg/homestar:latest
+    container_name: homestar
+    restart: unless-stopped
+    networks:
+      - fusion-net
+    ports:
+      - "7000:7000"   # IPVM task submission API
+      - "7001:7001"   # Homestar metrics / health
+    environment:
+      # Point at local IPFS node for block exchange
+      HOMESTAR_NETWORK__IPFS_HOST: "host.containers.internal"
+      HOMESTAR_NETWORK__IPFS_PORT: "5001"
+      # UCAN keypair — in prod, load from op:// switchboard
+      HOMESTAR_NODE__KEYPAIR_PATH: "/data/node.key"
+      # Publish workflow receipts as IPLD DAG nodes
+      HOMESTAR_WORKFLOW__RECEIPTS_ENABLED: "true"
+    volumes:
+      - homestar-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  # ---------------------------------------------------------------------
+  # 11) IPFS (Kubo): Block storage backend
+  # XET chunks and IPVM workflow receipts live here.
+  # All sovereign-tier blobs (LuciStones, agent memory, Sentropy snapshots)
+  # get globally unique CIDs.
+  # Ref: https://github.com/ipfs/kubo
+  # IPv6: 2602:F674:0000:0700::529 (block cache, LDS 700.529)
+  # ---------------------------------------------------------------------
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: ipfs
+    restart: unless-stopped
+    networks:
+      - fusion-net
+    ports:
+      - "4001:4001"   # Swarm (p2p)
+      - "5001:5001"   # API (internal only — not exposed to host)
+      - "8089:8080"   # Gateway (read-only)
+    environment:
+      IPFS_PROFILE: "server"
+    volumes:
+      - ipfs-data:/data/ipfs
+    healthcheck:
+      test: ["CMD", "ipfs", "id"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 volumes:
   gogs-data:
   caddy-data:
@@ -263,3 +325,5 @@ volumes:
   opendeepwiki-data:
   coder-db-data:
   coder-data:
+  homestar-data:
+  ipfs-data:
