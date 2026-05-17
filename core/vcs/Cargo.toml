@@ -31,9 +31,9 @@ blake3 = "1.5"        # CAS hashing — 256-bit, parallel
 zstd = "0.13"         # Block compression
 memmap2 = "0.9"       # mmap for cold blocks
 
-# Tracing / observability
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Tracing / observability — tokio.rs/tokio/topics/tracing
+tracing = { version = "0.1", features = ["attributes"] }   # enables #[instrument]
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "ansi"] }
 
 # Serialization
 serde = { version = "1", features = ["derive"] }

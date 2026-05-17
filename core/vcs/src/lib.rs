@@ -18,6 +18,7 @@ pub mod submodules;
 use std::net::Ipv6Addr;
 use std::path::Path;
 use thiserror::Error;
+use tracing::instrument;
 
 /// LuciVerse IPv6 root for the VCS tier.
 pub const VCS_IPV6_ROOT: &str = "2602:F674:0000:0700::/64";
@@ -90,6 +91,7 @@ pub struct LuciRepository {
 impl LuciRepository {
     /// Open a repository at the given path. Progress events are emitted on
     /// the prodash tree — wire up `prodash::render::line` to surface them.
+    #[instrument(fields(path = %path.as_ref().display()))]
     pub fn open(path: impl AsRef<Path>) -> Result<Self, VcsError> {
         let inner = gix::open(path.as_ref())?;
         let progress = prodash::tree::Root::new();

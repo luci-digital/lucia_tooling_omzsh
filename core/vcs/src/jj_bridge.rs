@@ -11,6 +11,7 @@
 use std::path::Path;
 use std::process::Command;
 use thiserror::Error;
+use tracing::{instrument, warn};
 
 #[derive(Debug, Error)]
 pub enum JjError {
@@ -33,6 +34,7 @@ impl<'a> JjBridge<'a> {
 
     /// Initialise a jj workspace on top of an existing git repo.
     /// `jj git init --git-repo=.` makes jj track the existing git history.
+    #[instrument(fields(repo = %self.repo_path.display()))]
     pub fn colocate(&self) -> Result<(), JjError> {
         let status = Command::new("jj")
             .arg("git")
@@ -48,6 +50,7 @@ impl<'a> JjBridge<'a> {
 
     /// List all change IDs in topological order. Every change is named and
     /// reachable — no anonymous branches, matching LuciStone semantics.
+    #[instrument(fields(repo = %self.repo_path.display()))]
     pub fn log(&self) -> Result<Vec<String>, JjError> {
         let out = Command::new("jj")
             .arg("log")
@@ -57,7 +60,9 @@ impl<'a> JjBridge<'a> {
             .current_dir(self.repo_path)
             .output()?;
         if !out.status.success() {
-            return Err(JjError::ExitStatus(out.status.code().unwrap_or(-1)));
+            let code = out.status.code().unwrap_or(-1);
+            warn!(exit_code = code, "jj log failed");
+            return Err(JjError::ExitStatus(code));
         }
         Ok(String::from_utf8_lossy(&out.stdout)
             .lines()

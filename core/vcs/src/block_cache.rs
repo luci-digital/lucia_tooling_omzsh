@@ -19,6 +19,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
+use tracing::{debug, instrument, warn};
 
 /// Target block size — content-defined chunking aims for this average.
 pub const TARGET_BLOCK_SIZE: usize = 1024 * 1024; // 1 MiB
@@ -61,11 +62,13 @@ impl BlockCache {
 
     /// Write a block to the cache. Returns its CAS address.
     /// Idempotent — if the address already exists, the existing block is kept.
+    #[instrument(skip(self, data), fields(bytes = data.len()))]
     pub async fn put(&self, data: &[u8]) -> std::io::Result<BlockAddr> {
         let addr = BlockAddr::from_bytes(data);
         let path = self.path_for(&addr);
 
         if fs::try_exists(&path).await? {
+            debug!(addr = %addr.to_hex(), "block already cached — skipping write");
             return Ok(addr);
         }
 
@@ -76,14 +79,19 @@ impl BlockCache {
         f.write_all(&compressed).await?;
         f.flush().await?;
         fs::rename(&tmp, &path).await?;
+        debug!(addr = %addr.to_hex(), compressed_bytes = compressed.len(), "block written");
 
         Ok(addr)
     }
 
     /// Read a block by its address.
+    #[instrument(skip(self), fields(addr = %addr.to_hex()))]
     pub async fn get(&self, addr: &BlockAddr) -> std::io::Result<Vec<u8>> {
         let path = self.path_for(addr);
-        let compressed = fs::read(&path).await?;
+        let compressed = fs::read(&path).await.map_err(|e| {
+            warn!(addr = %addr.to_hex(), error = %e, "cache miss");
+            e
+        })?;
         zstd::decode_all(compressed.as_slice())
     }
 
