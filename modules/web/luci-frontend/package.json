@@ -1,5 +1,5 @@
 {
-  "name": "my-tanstack-app",
+  "name": "luci-frontend",
   "private": true,
   "type": "module",
   "imports": {
