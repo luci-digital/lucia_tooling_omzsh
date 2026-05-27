@@ -84,6 +84,15 @@ down:
 deploy-local:
     nix run .#deploy-local
 
-# Deploy with an explicit profile env-file (local | staging | production)
-deploy profile="local":
-    podman-compose --env-file modules/orchestration/podman/env/{{profile}}.env -f {{compose}} up -d
+# Scaffold the stack .env from a profile template (local | staging | production)
+init-env profile="local":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    dir=modules/orchestration/podman
+    if [ "{{profile}}" = "local" ]; then src="$dir/.env.example"; else src="$dir/.env.{{profile}}.example"; fi
+    cp "$src" "$dir/.env"
+    echo "Wrote $dir/.env from {{profile}} profile — fill in secrets (never commit .env)."
+
+# Deploy using an env-file (default: the stack .env you created via init-env)
+deploy env-file="modules/orchestration/podman/.env":
+    podman-compose --env-file {{env-file}} -f {{compose}} up -d

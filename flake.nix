@@ -70,6 +70,8 @@
         # cd to repo root (works regardless of invocation dir).
         cdRoot = ''cd "$(git rev-parse --show-toplevel)"'';
         composeFile = "modules/orchestration/podman/podman-compose.yml";
+        composeEnv = "modules/orchestration/podman/.env";
+        composeEnvExample = "modules/orchestration/podman/.env.example";
         # Shared zsh syntax-check body (run after cdRoot).
         zshCheckBody = ''
           shopt -s nullglob globstar
@@ -145,10 +147,11 @@
             ${zshCheckBody}
           '';
 
-          # podman compose config validation
+          # podman compose config validation (uses the example env so required
+          # ${VAR:?} vars resolve without needing real secrets present)
           compose-config = mkApp "compose-config" podmanRuntime ''
             ${cdRoot}
-            podman-compose -f ${composeFile} config
+            podman-compose --env-file ${composeEnvExample} -f ${composeFile} config
           '';
 
           # Aggregate — run the full local CI gate
@@ -159,7 +162,7 @@
             echo "▶ web build";       ( cd modules/web/luci-frontend && pnpm install --frozen-lockfile && pnpm build && pnpm test )
             echo "▶ shellcheck";      git ls-files '*.sh' ':!:modules/legacy/**' | xargs -r shellcheck
             echo "▶ shfmt";           git ls-files '*.sh' ':!:modules/legacy/**' | xargs -r shfmt -d
-            echo "▶ compose config";  podman-compose -f ${composeFile} config >/dev/null
+            echo "▶ compose config";  podman-compose --env-file ${composeEnvExample} -f ${composeFile} config >/dev/null
             echo "✓ local CI gate passed"
           '';
 
@@ -187,14 +190,18 @@
             echo "▶ shellcheck";     git ls-files '*.sh' ':!:modules/legacy/**' | xargs -r shellcheck
             echo "▶ shfmt";          git ls-files '*.sh' ':!:modules/legacy/**' | xargs -r shfmt -d
             echo "▶ zsh syntax";     zsh -n modules/legacy/original-layout/oh-my-zsh.sh
-            echo "▶ compose config"; podman-compose -f ${composeFile} config >/dev/null
+            echo "▶ compose config"; podman-compose --env-file ${composeEnvExample} -f ${composeFile} config >/dev/null
             echo "✓ checks passed"
           '';
 
-          # compose-up — start the sovereign stack (detached)
+          # compose-up — start the sovereign stack (detached). Needs .env.
           compose-up = mkApp "compose-up" podmanRuntime ''
             ${cdRoot}
-            exec podman-compose -f ${composeFile} up -d
+            if [ ! -f ${composeEnv} ]; then
+              echo "Missing ${composeEnv} — copy .env.example and fill secrets." >&2
+              exit 1
+            fi
+            exec podman-compose --env-file ${composeEnv} -f ${composeFile} up -d
           '';
 
           # compose-down — stop the sovereign stack
@@ -206,9 +213,13 @@
           # deploy-local — build images + (re)start the stack, then show status
           deploy-local = mkApp "deploy-local" podmanRuntime ''
             ${cdRoot}
-            echo "▶ building images";  podman-compose -f ${composeFile} build
-            echo "▶ starting stack";   podman-compose -f ${composeFile} up -d
-            echo "▶ status";           podman-compose -f ${composeFile} ps
+            if [ ! -f ${composeEnv} ]; then
+              echo "Missing ${composeEnv} — copy .env.example and fill secrets." >&2
+              exit 1
+            fi
+            echo "▶ building images";  podman-compose --env-file ${composeEnv} -f ${composeFile} build
+            echo "▶ starting stack";   podman-compose --env-file ${composeEnv} -f ${composeFile} up -d
+            echo "▶ status";           podman-compose --env-file ${composeEnv} -f ${composeFile} ps
             echo "✓ local deploy complete"
           '';
 
