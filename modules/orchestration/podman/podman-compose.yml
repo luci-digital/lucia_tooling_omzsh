@@ -208,7 +208,7 @@ services:
       - fusion-net
     environment:
       POSTGRES_USER: coder
-      POSTGRES_PASSWORD: ${CODER_DB_PASSWORD:-coder_sovereign_741}
+      POSTGRES_PASSWORD: ${CODER_DB_PASSWORD:?set CODER_DB_PASSWORD in .env (see .env.example)}
       POSTGRES_DB: coder
     volumes:
       - coder-db-data:/var/lib/postgresql/data
@@ -230,13 +230,13 @@ services:
     ports:
       - "7080:7080"
     environment:
-      CODER_PG_CONNECTION_URL: "postgresql://coder:${CODER_DB_PASSWORD:-coder_sovereign_741}@coder-db/coder?sslmode=disable"
+      CODER_PG_CONNECTION_URL: "postgresql://coder:${CODER_DB_PASSWORD:?set CODER_DB_PASSWORD in .env}@coder-db/coder?sslmode=disable"
       CODER_HTTP_ADDRESS: "0.0.0.0:7080"
       CODER_ACCESS_URL: "${CODER_ACCESS_URL:-http://coder.lucidigital.io}"
       # Wildcard for workspace sub-domains (browser port forwarding)
       CODER_WILDCARD_ACCESS_URL: "${CODER_WILDCARD_ACCESS_URL:-*.coder.lucidigital.io}"
       # Use Podman socket for workspace provisioning
-      CODER_PROVISIONER_DAEMON_PSK: "${CODER_PSK:-luciverse_741_psk}"
+      CODER_PROVISIONER_DAEMON_PSK: "${CODER_PSK:?set CODER_PSK in .env (see .env.example)}"
       CODER_TELEMETRY_ENABLE: "false"
       # SCM integration — point at Gogs
       CODER_GITAUTH_0_ID: "gogs"
