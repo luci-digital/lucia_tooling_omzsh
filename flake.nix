@@ -72,7 +72,8 @@
         composeFile = "modules/orchestration/podman/podman-compose.yml";
         composeEnv = "modules/orchestration/podman/.env";
         composeEnvExample = "modules/orchestration/podman/.env.example";
-        # Shared zsh syntax-check body (run after cdRoot).
+        # Shared zsh syntax-check body (run after cdRoot). Sets `fail`; the
+        # caller is responsible for the final `exit "$fail"`.
         zshCheckBody = ''
           shopt -s nullglob globstar
           fail=0
@@ -82,11 +83,11 @@
             modules/legacy/original-layout/plugins/*/*.plugin.zsh \
             modules/legacy/original-layout/plugins/*/_* \
             modules/legacy/original-layout/themes/*.zsh-theme \
-            modules/shell/**/*.zsh; do
+            modules/shell/**/*.zsh \
+            modules/shell/zshrc/.zshrc; do
             [ -e "$f" ] || continue
             zsh -n "$f" || { echo "SYNTAX FAIL: $f"; fail=1; }
           done
-          exit "$fail"
         '';
       in
       {
@@ -145,6 +146,7 @@
           zsh-syntax = mkApp "zsh-syntax" (with pkgs; [ zsh git ]) ''
             ${cdRoot}
             ${zshCheckBody}
+            exit "$fail"
           '';
 
           # podman compose config validation (uses the example env so required
@@ -223,10 +225,13 @@
             echo "✓ local deploy complete"
           '';
 
-          # zsh-test — zsh syntax checks over the shell environment
+          # zsh-test — syntax checks + clean-shell config validation
           zsh-test = mkApp "zsh-test" (with pkgs; [ zsh git ]) ''
             ${cdRoot}
             ${zshCheckBody}
+            echo "▶ clean-shell config test"
+            zsh modules/shell/test/clean-shell-test.zsh || fail=1
+            exit "$fail"
           '';
         };
 
@@ -274,9 +279,14 @@
             '';
           };
 
-          # shell — LuciVerse zsh environment (Oh My Zsh in legacy/).
+          # shell — LuciVerse zsh environment (Nix-managed; OMZ in legacy/).
+          # Sets ZDOTDIR to the sovereign .zshrc; run `zsh` to enter it.
           shell = pkgs.mkShell {
             packages = with pkgs; [ zsh ];
+            shellHook = ''
+              export ZDOTDIR="$(git rev-parse --show-toplevel)/modules/shell/zshrc"
+              echo "Nix-managed zsh ready — run 'zsh' (ZDOTDIR=$ZDOTDIR)"
+            '';
           };
         };
 
