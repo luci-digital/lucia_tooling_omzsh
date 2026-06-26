@@ -14,7 +14,7 @@ Comprehensive integration plan to unify multiple LuciVerse components into the `
 
 ### 1. LuciaAIbuilddocs
 **Location:** `/Users/darylharr/lucia/luciverse-monorepo/LuciaAIbuilddocs`
-**Status:** Already symlinked from `/Users/darylharr/lucia/LuciaAIbuilddocs`
+**Status:** ✅ **INTEGRATED** 2026-06-26
 
 **Contents:**
 - `LUCI_ARCHITECTURE.md` - openEuler/RISC-V/Swift architecture
@@ -23,14 +23,16 @@ Comprehensive integration plan to unify multiple LuciVerse components into the `
 - `src/`, `src1/`, `share/` - Build artifacts and libraries
 
 **Integration Actions:**
-- [ ] Move architectural docs to `modules/docs/architecture/`
-- [ ] Extract build sequences to `modules/docs/deployment/`
+- [x] Move architectural docs to `modules/docs/architecture/luci-architecture.md`
+- [x] Copy LUCIA_AI_BUILD_PLAN to `modules/docs/build/lucia-ai-build-plan.md`
+- [x] Create INTEGRATION_INDEX.md for navigation
+- [x] Link from CLAUDE.md
 - [ ] Document Python dependencies in `requirements.txt` or Poetry
 - [ ] Archive lib/ as external dependencies (not tracked in git)
-- [ ] Link to LUCIA_AI_BUILD_PLAN.md from main docs
 
 ### 2. LUCIA_AI_BUILD_PLAN.md
 **Location:** `/Users/darylharr/lucia/LUCIA_AI_BUILD_PLAN.md`
+**Status:** ✅ **INTEGRATED** 2026-06-26
 
 **Contents:**
 - 6-phase build plan (Prerequisites → LSO)
@@ -41,11 +43,11 @@ Comprehensive integration plan to unify multiple LuciVerse components into the `
 - Deploy and startup procedures
 
 **Integration Actions:**
-- [ ] Copy to `modules/docs/` as canonical build reference
+- [x] Copy to `modules/docs/build/lucia-ai-build-plan.md`
+- [x] Reference from CLAUDE.md
+- [x] Link from INTEGRATION_INDEX.md
 - [ ] Extract tier mappings to `modules/docs/architecture/tiers.md`
-- [ ] Document Lua version requirements in build docs
 - [ ] Link phase execution to `justfile` or `Makefile`
-- [ ] Reference from CLAUDE.md
 
 ### 3. ~/.xmake Configuration
 **Location:** `/Users/darylharr/.xmake`
@@ -61,18 +63,79 @@ Comprehensive integration plan to unify multiple LuciVerse components into the `
 
 ### 4. gix-jj-gerrit-lucitense VCS
 **Location:** `/Volumes/tb4-d8a-space/lucitense/gix-jj-gerrit-lucitense`
+**Status:** ✅ **SYMLINKED** 2026-06-26
 
 **Purpose:** Replace or augment current luci-vcs with gix-jj-gerrit integration
 
 **Integration Actions:**
-- [ ] Explore gix-jj-gerrit-lucitense repository structure
-- [ ] Identify overlap with `modules/scm/luci-vcs`
-- [ ] Decide: replace, augment, or co-exist?
-- [ ] Update `modules/scm/` to reference external VCS
+- [x] Explore gix-jj-gerrit-lucitense repository structure
+- [x] Symlink to `modules/scm/gix-jj-gerrit`
+- [x] Decided: Co-exist (luci-vcs library + gix-jj-gerrit workflows)
 - [ ] Document VCS workflow in CLAUDE.md
 - [ ] Update flake.nix if external path needed
+- [ ] Create justfile targets for gix-jj operations
 
-### 5. ~/.lucia Shell Enhancement (COMPLETED ✅)
+### 5. DAGwood Content-Addressed Storage
+**Location:** `/Volumes/tb4-d8a-space/lucitense/TRANSMUTED/dagwood/`
+**Status:** ✅ **INTEGRATED** 2026-06-26
+
+**Purpose:** Content-addressed hashnode storage with provenance tracking
+
+**Current State:**
+- ✅ 37,544 hashnodes created
+- ✅ SHA256 content-addressed storage
+- ✅ Hashdag index with full provenance
+- ✅ Source roots: etherpots-archive, luciverse-monorepo-canonical
+
+**Integration Actions:**
+- [x] Create `modules/dagwood/` directory
+- [x] Implement Python DAGwood resolver (`resolver.py`)
+- [x] Create configuration (`config.toml`)
+- [x] Document usage in `README.md`
+- [x] Reference from INTEGRATION_INDEX.md
+- [ ] Add DAGwood resolver to Nix flake
+- [ ] Create justfile target: `just dagwood-resolve <hash>`
+- [ ] Integrate with LuciVault for hash signing
+
+**Files Created:**
+```
+modules/dagwood/
+├── README.md              # DAGwood overview and usage
+├── resolver.py            # Python DAGwood resolver
+├── config.toml            # DAGwood configuration
+└── test/                  # Test suite (pending)
+```
+
+### 6. LuciVault + 1Password Integration
+**Location:** `modules/vault/`
+**Status:** ✅ **INTEGRATED** 2026-06-26
+
+**Purpose:** Credential-less authentication via Agent Vault proxy
+
+**Integration Actions:**
+- [x] Create `modules/vault/` directory
+- [x] Document Agent Vault architecture in `README.md`
+- [x] Create configuration (`vault.toml`)
+- [x] Define agent permissions (`agent-permissions.json`)
+- [x] Reference from INTEGRATION_INDEX.md
+- [ ] Implement `lucivault-client.py`
+- [ ] Implement `onepassword-connect.sh` wrapper
+- [ ] Implement `agent-vault-proxy.py`
+- [ ] Implement `sign-hashnode.py` for DAGwood
+- [ ] Implement `scribe-svg-parser.py` for sCRIBe artifacts
+- [ ] Add Sacred Witness consent protocol
+- [ ] Integrate with existing `make install-op-signing`
+
+**Files Created:**
+```
+modules/vault/
+├── README.md                  # LuciVault + 1Password overview
+└── config/
+    ├── vault.toml             # Vault configuration
+    └── agent-permissions.json # Agent access control (5 agents defined)
+```
+
+### 7. ~/.lucia Shell Enhancement (COMPLETED ✅)
 **Location:** `/Users/darylharr/.lucia`
 **Status:** Completed 2026-06-26
 

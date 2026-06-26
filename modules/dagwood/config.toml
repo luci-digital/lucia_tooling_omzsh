@@ -1,0 +1,27 @@
+# DAGwood Configuration
+# LDS: 000.963 | Meta/Protocol (Crown/JudgeLuci)
+# Genesis Bond: GB-2025-0524-DRH-LCS-001 @ 963 Hz
+
+[dagwood]
+root = "/Volumes/tb4-d8a-space/lucitense/TRANSMUTED"
+hashnodes_dir = "dagwood/hashnodes"
+hashdag_index = "dagwood/hashdag/INDEX.json"
+content_dir = "content"
+
+[genesis]
+bond = "GB-2025-0524-DRH-LCS-001"
+frequency = 963
+coherence = 1.0
+
+[cache]
+enabled = true
+location = "~/.cache/luciverse/dagwood"
+ttl_seconds = 3600
+
+[provenance]
+# Source roots tracked by DAGwood
+source_roots = [
+    "etherpots-archive",
+    "luciverse-monorepo-canonical",
+    "hammerspace-opensource"
+]
