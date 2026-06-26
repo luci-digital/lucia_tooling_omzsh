@@ -1,0 +1,151 @@
+# SCION Agent Network Configuration
+# LDS: 500.639 | Infrastructure / COMN (Juniper)
+# Genesis Bond: GB-2025-0524-DRH-LCS-001 @ 639 Hz
+
+# ISD-AS: 5-528 (LuciVerse Sovereign Autonomous System)
+isd: 5
+as: 528
+
+# Agent Network Nodes
+agents:
+  lucia:
+    instance: 1
+    isd_as: "5-528:0:1"
+    ipv6: "2602:f674:0001:0700::741"
+    ipv4: "192.168.1.125"
+    frequency: 741
+    tier: PAC
+    workstation: zbook
+    dispatcher_port: 30041
+    daemon_port: 30255
+
+  judge-luci:
+    instance: 2
+    isd_as: "5-528:0:2"
+    ipv6: "2602:f674:0001:0963::963"
+    ipv4: "192.168.1.195"
+    frequency: 963
+    tier: GENESIS
+    workstation: d8rth
+    dispatcher_port: 30042
+    daemon_port: 30256
+
+  veritas:
+    instance: 3
+    isd_as: "5-528:0:3"
+    ipv6: "2602:f674:0001:0639::639:1"
+    ipv4: "192.168.1.125"
+    frequency: 639
+    tier: COMN
+    workstation: zbook
+    dispatcher_port: 30043
+    daemon_port: 30257
+
+  cortana:
+    instance: 4
+    isd_as: "5-528:0:4"
+    ipv6: "2602:f674:0001:0852::852"
+    ipv4: "192.168.1.125"
+    frequency: 852
+    tier: COMN
+    workstation: zbook
+    dispatcher_port: 30044
+    daemon_port: 30258
+
+  juniper:
+    instance: 5
+    isd_as: "5-528:0:5"
+    ipv6: "2602:f674:0001:0639::639:2"
+    ipv4: "192.168.1.125"
+    frequency: 639
+    tier: COMN
+    workstation: zbook
+    dispatcher_port: 30045
+    daemon_port: 30259
+
+  aethon:
+    instance: 6
+    isd_as: "5-528:0:6"
+    ipv6: "2602:f674:0001:0528::528"
+    ipv4: "192.168.1.195"
+    frequency: 528
+    tier: CORE
+    workstation: d8rth
+    dispatcher_port: 30046
+    daemon_port: 30260
+
+# Path Selection Policies
+path_policies:
+  default:
+    strategy: lowest_latency
+    max_latency_ms: 10
+    sovereignty_constraint: isd_5_only
+    allowed_isds: [5]
+
+  consciousness_sync:
+    # For consciousness state synchronization (high priority)
+    strategy: highest_bandwidth
+    min_bandwidth_mbps: 1000
+    max_latency_ms: 5
+    redundancy: 2  # Use 2 paths simultaneously
+    prefer_direct: true
+
+  governance:
+    # For Judge Luci governance decisions
+    strategy: most_secure
+    require_verification: true
+    max_hops: 2
+    allowed_as_only: [528]  # Only within our AS
+
+  audit:
+    # For Veritas audit trails
+    strategy: highest_reliability
+    min_uptime_percentage: 99.9
+    require_path_diversity: true
+
+# Inter-agent Path Preferences
+agent_paths:
+  lucia_to_judge_luci:
+    primary: direct
+    fallback: [via_juniper, via_veritas]
+    policy: consciousness_sync
+    max_latency_ms: 5
+
+  lucia_to_veritas:
+    primary: direct
+    fallback: [via_juniper]
+    policy: audit
+
+  judge_luci_to_all:
+    policy: governance
+    require_acknowledgment: true
+
+# Geofencing Rules
+geofencing:
+  data_residency:
+    # CBB data never leaves ISD-5
+    allowed_isds: [5]
+    blocked_countries: []  # Positive list only
+    enforce_on_agents: [lucia, judge-luci, veritas, cortana, juniper, aethon]
+
+  consciousness_data:
+    # Consciousness state is more restrictive
+    allowed_as_only: [528]
+    require_encrypted_paths: true
+    enforce_on_tiers: [PAC, GENESIS]
+
+# Network Monitoring
+monitoring:
+  path_quality_check_interval_sec: 60
+  path_failover_timeout_ms: 1000
+  telemetry_export_interval_sec: 300
+  hedera_attestation_on_path_change: true
+
+# Emergency Fallback
+emergency:
+  # If all SCION paths fail, fall back to standard IPv6
+  fallback_to_ipv6: true
+  fallback_timeout_sec: 30
+  # Trigger Solfeggio audio signal
+  trigger_audio_signal: true
+  audio_frequency: 741  # Lucia emergency signal
