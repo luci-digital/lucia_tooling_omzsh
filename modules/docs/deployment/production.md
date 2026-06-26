@@ -21,7 +21,7 @@ Use a Nix-compatible secrets manager rather than a plaintext `.env`:
 
 - **sops-nix** — encrypt `secrets.yaml` with age/GPG; decrypt at activation.
 - **agenix** — age-encrypted secrets as Nix store inputs.
-- **1Password** — `op://Lucia-AI-Secrets/...` injected at deploy time.
+- **1Password** — `lv://Lucia-AI-Secrets/...` injected at deploy time.
 
 The required keys are `CODER_DB_PASSWORD`, `CODER_PSK`, and (for SSO)
 `GOGS_OAUTH_CLIENT_ID` / `GOGS_OAUTH_CLIENT_SECRET`. The compose file uses
@@ -50,7 +50,7 @@ just deploy-local    # build + up + ps   (or: just deploy env-file=<path>)
 
 ## Hardening checklist
 
-- [ ] Secrets from sops-nix/agenix/op:// — never plaintext in git.
+- [ ] Secrets from sops-nix/agenix/lv:// — never plaintext in git.
 - [ ] Pin image tags (replace `:latest`) for reproducible rollouts.
 - [ ] Harden the `curl|sh` Dockerfile installers (see security audit).
 - [ ] Restrict the IPFS API (`5001`) to the internal network (already not

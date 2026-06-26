@@ -44,7 +44,7 @@ services:
   # ---------------------------------------------------------------------
   lucia-orchestrator:
     build:
-      context: /Users/darylharr/Daryl_harr_feb26_26/workspace/lucia/luciverse-core-orchestrator
+      context: /Users/darylharr/lucia/luciverse-monorepo/luciverse-core-orchestrator
       dockerfile: Dockerfile
     container_name: lucia
     restart: unless-stopped
@@ -277,7 +277,7 @@ services:
       # Point at local IPFS node for block exchange
       HOMESTAR_NETWORK__IPFS_HOST: "host.containers.internal"
       HOMESTAR_NETWORK__IPFS_PORT: "5001"
-      # UCAN keypair — in prod, load from op:// switchboard
+      # UCAN keypair — in prod, load from lv:// switchboard
       HOMESTAR_NODE__KEYPAIR_PATH: "/data/node.key"
       # Publish workflow receipts as IPLD DAG nodes
       HOMESTAR_WORKFLOW__RECEIPTS_ENABLED: "true"

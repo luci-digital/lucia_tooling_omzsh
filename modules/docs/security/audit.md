@@ -33,7 +33,7 @@ A deploy with no env set would silently boot with these public values.
 
 **Fix:** switched to `${VAR:?...}` so the stack fails fast if the secret is
 unset. Values now come from a gitignored `.env` (see `.env*.example`), and
-production guidance points at sops-nix / agenix / `op://`.
+production guidance points at sops-nix / agenix / `lv://`.
 
 ### 2. `curl | sh` installers — FLAGGED (Medium)
 

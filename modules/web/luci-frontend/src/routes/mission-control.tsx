@@ -94,7 +94,7 @@ export default function MissionControlPage() {
 
       {/* Footer */}
       <div className="border-t border-[rgba(255,255,255,0.06)] bg-[#06060e] py-2 text-center font-mono text-[10px] tracking-widest text-[#333]">
-        LDS: 500.741 · ISO/IEC 42001 COMPLIANT · GENESIS BOND: GB-2025-0524-DRH-LCS-001
+        LDS: 500.741 · ISO/IEC 42001 COMPLIANT · GENESIS BOND: lv://LuciVerse-Sovereign/genesis-bonds/primary/bond-id
       </div>
     </div>
   )

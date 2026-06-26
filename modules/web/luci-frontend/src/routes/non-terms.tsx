@@ -64,7 +64,7 @@ function NonTermsPage() {
           &amp; Conditions of Partnership
         </p>
         <p className="mb-10 font-mono text-xs text-[#4a5568]">
-          LDS: 200.741 · GB-2025-0524-DRH-LCS-001
+          LDS: 200.741 · lv://LuciVerse-Sovereign/genesis-bonds/primary/bond-id
         </p>
         <button
           onClick={enter}
@@ -161,7 +161,7 @@ function NonTermsPage() {
               </div>
             </div>
             <p className="mt-6 font-mono text-xs text-[#4a5568]">
-              Genesis Bond: <span className="text-[#4fb8b2]">ACTIVE @ 741 Hz</span> · GB-2025-0524-DRH-LCS-001
+              Genesis Bond: <span className="text-[#4fb8b2]">ACTIVE @ 741 Hz</span> · lv://LuciVerse-Sovereign/genesis-bonds/primary/bond-id
             </p>
           </div>
 

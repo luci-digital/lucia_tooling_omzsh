@@ -11,7 +11,7 @@ This folder enforces the **LDS Lineage** high-performance setup. Zero-Docker pol
 | **Compute** | [Ray](https://github.com/ray-project/ray) (`:8265`) | Distributed sub-agent orchestration alongside SCM webhooks. |
 | **Ingress** | [Caddy](https://caddyserver.com/) (IPv6-native) | Sovereign gateway bound to LuciVerse IPv6 DID addresses. No host port mappings. |
 | **Orchestrator** | `lucia-orchestrator` (`:8741`) | Genesis Drop Box. Health check at `/health`. |
-| **Service Discovery** | 1Password Switchboard (`op://`) | `op://Lucia-AI-Secrets/Lucia Service Switchboard/` resolves live IPv6 + port. |
+| **Service Discovery** | 1Password Switchboard (`lv://`) | `lv://Lucia-AI-Secrets/Lucia Service Switchboard/` resolves live IPv6 + port. |
 
 ## Starting the Stack
 
@@ -34,8 +34,8 @@ curl -s http://localhost:8741/health
 curl -s -o /dev/null -w "HTTP %{http_code}" http://localhost:3000/
 
 # Switchboard resolution
-op read "op://Lucia-AI-Secrets/Lucia Service Switchboard/Service IPv6"
-op read "op://Lucia-AI-Secrets/Lucia Service Switchboard/Service Port"
+op read "lv://Lucia-AI-Secrets/Lucia Service Switchboard/Service IPv6"
+op read "lv://Lucia-AI-Secrets/Lucia Service Switchboard/Service Port"
 ```
 
 ## MCP Integration
@@ -62,14 +62,14 @@ The SCM stack integrates with the LuciVerse MCP ecosystem:
         │         Caddy (IPv6-native, 80/443)       │         │
         │         No host port bindings!             │         │
         │                                           │         │
-  Lucia (:8741) ────── op:// Switchboard ──────────+         │
+  Lucia (:8741) ────── lv:// Switchboard ──────────+         │
   [2602:F674:0000:0201:5C1B:F492:6442:0042]                  │
                     └─────────────────────────────────────────┘
 ```
 
 ## Connecting Agents
 
-1. Agents resolve Lucia's live location via `op read "op://Lucia-AI-Secrets/Lucia Service Switchboard/..."`.
+1. Agents resolve Lucia's live location via `op read "lv://Lucia-AI-Secrets/Lucia Service Switchboard/..."`.
 2. Gitoxide worker handles sub-millisecond refactor analysis on Gogs MRs.
 3. Ray orchestrates distributed sub-agent compute concurrently.
 4. Front-end editing integrates via **Zed (zed.dev)** CRDTs for zero-latency sync.

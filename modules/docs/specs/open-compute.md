@@ -422,7 +422,7 @@ UCAN-Proof: <CID>               authorization proof CID
 # LDS: 800.741 | IPv6: 2602:F674:0000:0800::741
 
 [node]
-keypair_path = "/data/node.key"          # Ed25519 keypair (op:// in prod)
+keypair_path = "/data/node.key"          # Ed25519 keypair (lv:// in prod)
 did = "did:key:<base58btc encoded key>"
 
 [network]

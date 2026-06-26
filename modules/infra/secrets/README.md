@@ -2,5 +2,5 @@
 
 - `env.example` — template for required environment variables.
 
-Real secrets are sourced from the 1Password switchboard (`op://`) at deploy
+Real secrets are sourced from the 1Password switchboard (`lv://`) at deploy
 time and **never** committed. Copy `env.example` to `.env` locally.
