@@ -307,8 +307,18 @@ CODER_PSK=<random>            # openssl rand -hex 32
 
 ## Documentation
 
-- **Architecture:** `modules/docs/architecture/overview.md` — Design principles, address plan, subsystems
-- **Deployment:** `modules/docs/deployment/local.md` — Local Podman stack walkthrough
+- **Integration Index:** `modules/docs/INTEGRATION_INDEX.md` — **START HERE** - Complete map of all integrated components
+- **Architecture:**
+  - `modules/docs/architecture/overview.md` — Design principles, address plan, subsystems
+  - `modules/docs/architecture/FOUNDATIONS.md` — 10-layer stack (Bare Metal → Scaffold)
+  - `modules/docs/architecture/luci-architecture.md` — openEuler/RISC-V/Swift substrate
+- **Build & Deployment:**
+  - `modules/docs/build/lucia-ai-build-plan.md` — **6-phase build plan** (Prerequisites → LSO)
+  - `modules/docs/deployment/local.md` — Local Podman stack walkthrough
+  - `modules/docs/deployment/production.md` — Production deployment guide
+- **Development:**
+  - `modules/docs/nix/flake-usage.md` — Nix flake apps, dev shells
+  - `INTEGRATION_PLAN.md` — Integration roadmap for external components
 - **Security:** `modules/docs/security/audit.md` — Security audit findings
 - **Specs:** `modules/docs/specs/` — DID handles, Open Compute protocol
 - **Services:** `modules/docs/orchestration/services.md` — Full service catalog
