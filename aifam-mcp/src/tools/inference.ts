@@ -13,34 +13,38 @@ export function registerInferenceTools(server: McpServer, ctx: AppContext): void
   server.registerTool(
     "inference_chat",
     {
-      title: "Distributed chat completion",
+      title: "Chat completion (mesh or cloud)",
       description:
-        "Run a chat completion on the exo + MLX distributed mesh. exo shards the model across auto-discovered nodes (MLX on Apple Silicon, tinygrad on GPUs) behind an OpenAI-compatible API, so this works from any AI runtime.",
+        "Run a chat completion through any configured backend. Default 'mesh' shards the model across the exo + MLX cluster (auto-discovered nodes, OpenAI-compatible); 'anthropic' and 'openai' fan out to cloud runtimes. Use backends_list to see what is configured.",
       inputSchema: {
         messages: z.array(messageShape).min(1).describe("Chat messages in order."),
+        backend: z
+          .string()
+          .optional()
+          .describe("Backend id: mesh | anthropic | openai. Defaults to the configured default."),
         model: z
           .string()
           .optional()
-          .describe("Model id on the mesh. Defaults to the configured mesh default."),
+          .describe("Model id. Defaults to the chosen backend's default."),
         temperature: z.number().min(0).max(2).optional(),
         max_tokens: z.number().int().positive().optional(),
         ensure: z
           .boolean()
           .default(false)
-          .describe("Place and warm the model on the cluster before inference to avoid a cold start."),
+          .describe("Mesh only: place and warm the model on the cluster before inference to avoid a cold start."),
       },
     },
-    guard(async ({ messages, model, temperature, max_tokens, ensure }) => {
-      const modelId = model ?? ctx.exo.defaultModelId;
-      if (ensure) await ctx.exo.ensureModel(modelId);
-      const res = await ctx.exo.chat({
-        model: modelId,
+    guard(async ({ messages, backend, model, temperature, max_tokens, ensure }) => {
+      if (ensure && (backend ?? ctx.config.backends.default) === "mesh") {
+        await ctx.exo.ensureModel(model ?? ctx.exo.defaultModelId);
+      }
+      const res = await ctx.backends.chat(backend, {
+        model,
         messages: messages as ChatMessage[],
         temperature,
-        max_tokens,
+        maxTokens: max_tokens,
       });
-      const reply = res.choices?.[0]?.message?.content ?? "";
-      return text(reply || JSON.stringify(res));
+      return text(res.text || `[${res.backend}:${res.model}] (empty response)`);
     }),
   );
 

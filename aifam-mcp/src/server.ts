@@ -8,10 +8,10 @@ import { registerAgentTools } from "./tools/agents.js";
 const INSTRUCTIONS = `Aifam Mesh MCP (Iris) - a runtime-agnostic gateway for the Luciverse and Aifam agents.
 
 Two capability planes:
-  1. Distributed inference on an exo + MLX cluster (auto-discovered nodes, OpenAI-compatible). Tools: inference_chat, mesh_status, mesh_models, mesh_ensure_model, agent_invoke.
+  1. Inference. Default 'mesh' = distributed inference on an exo + MLX cluster (auto-discovered nodes). Cloud backends 'anthropic' and 'openai' fan out across runtimes. Tools: inference_chat, mesh_status, mesh_models, mesh_ensure_model, backends_list, agent_invoke, agent_fanout.
   2. Matter device control via the Home Assistant Matter Server. Tools: matter_devices, matter_device, matter_command, matter_read_attribute, matter_write_attribute, matter_commission.
 
-Agents flow push-only down the tier ladder PAC -> COMN -> CORE and must hold coherence. Use agents_list to see the roster, agent_invoke to run one.`;
+Agents flow push-only down the tier ladder PAC -> COMN -> CORE and must hold coherence. Use agents_list for the roster, backends_list for runtimes, agent_invoke to run one agent, agent_fanout to run one agent across several backends at once.`;
 
 export function createServer(ctx: AppContext): McpServer {
   const server = new McpServer(

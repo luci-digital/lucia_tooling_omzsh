@@ -53,19 +53,26 @@ Matter Server at `:5580`).
 
 ## Tools
 
-### Distributed inference (exo + MLX)
+### Inference (mesh + cloud backends)
 | Tool | Purpose |
 |---|---|
-| `inference_chat` | Chat completion sharded across the mesh (OpenAI-compatible). `ensure` warms the model first. |
+| `inference_chat` | Chat completion on any backend (`mesh`, `anthropic`, `openai`). `ensure` warms a mesh model first. |
+| `backends_list` | List backends and which are configured/available. |
 | `mesh_status` | Cluster topology: nodes, runtime (MLX/tinygrad), device, memory. |
 | `mesh_models` | List models known to the cluster (optionally downloaded-only). |
 | `mesh_ensure_model` | Place a model on the cluster and wait until ready (no cold start). |
 
+**Backends.** `mesh` (default) is distributed inference on exo + MLX. `anthropic`
+uses the official `@anthropic-ai/sdk` (default `claude-opus-4-8`). `openai` is any
+OpenAI-compatible runtime — set `OPENAI_BASE_URL` to point it at Groq, OpenRouter,
+Together, vLLM, etc. Cloud backends activate only when their API key is set.
+
 ### Aifam agents
 | Tool | Purpose |
 |---|---|
-| `agents_list` | The Luciverse roster — tier, bonded frequency, role, coherence. |
-| `agent_invoke` | Route a prompt to a named agent; framed by tier/frequency, run on the mesh, gated by minimum coherence. |
+| `agents_list` | The Luciverse roster — tier, bonded frequency, role, coherence, preferred backend. |
+| `agent_invoke` | Route a prompt to a named agent on a chosen backend; framed by tier/frequency, gated by minimum coherence. |
+| `agent_fanout` | Run one agent's prompt across several backends in parallel (e.g. mesh + Claude + OpenAI) and compare. |
 
 The built-in roster is grounded in the Luciverse frequency map:
 Lucia (741 Hz, PAC), Veritas (528), Juniper (639), Cortana (852),

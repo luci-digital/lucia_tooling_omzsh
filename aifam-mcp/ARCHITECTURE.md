@@ -60,10 +60,19 @@ distributed substrate underneath instead of treating inference as a black box.
   request to its response; surfaces `error_code` as a typed error. Wraps
   `get_nodes`, `get_node`, `device_command`, `read_attribute`, `write_attribute`,
   `commission_with_code`.
+- **`backends/`** — the runtime-agnostic chat layer. A `ChatBackend` interface
+  fronts `mesh` (exo + MLX, local distributed inference), `anthropic` (the
+  official Claude SDK), and `openai` (any OpenAI-compatible cloud runtime). A
+  `BackendRegistry` routes by name and reports which are configured. This is how
+  agents "fan out to cloud runtimes" — `agent_invoke` picks one backend,
+  `agent_fanout` runs the same prompt across several in parallel. The Anthropic
+  backend is the only place the Claude wire format lives; it omits sampling
+  params because the current Opus family rejects them.
 - **`agents/registry.ts`** — the Aifam roster, grounded in the Luciverse
   frequency map (432 root · 528 Veritas · 639 Juniper · 741 Lucia · 852 Cortana ·
-  963 Judge Luci). Tiers PAC→COMN→CORE flow push-only; `agent_invoke` is gated by
-  a configurable minimum coherence.
+  963 Judge Luci). Each agent may declare a preferred `backend` and `model`.
+  Tiers PAC→COMN→CORE flow push-only; `agent_invoke` is gated by a configurable
+  minimum coherence.
 - **`tools/`** — thin, well-described MCP tools over the clients. Every handler is
   wrapped by `guard()` so backend failures become clean tool errors, never crashes.
 - **`index.ts`** — selects the transport. stdio for local/embedded clients;

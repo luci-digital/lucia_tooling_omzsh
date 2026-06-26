@@ -31,6 +31,20 @@ const ConfigSchema = z.object({
     wsUrl: z.string().default("ws://localhost:5580/ws"),
     commandTimeoutMs: z.coerce.number().int().positive().default(30_000),
   }),
+  backends: z.object({
+    default: z.string().default("mesh"),
+    anthropic: z.object({
+      apiKey: z.string().optional(),
+      baseUrl: z.string().optional(),
+      defaultModel: z.string().default("claude-opus-4-8"),
+      maxTokens: z.coerce.number().int().positive().default(4096),
+    }),
+    openai: z.object({
+      apiKey: z.string().optional(),
+      baseUrl: z.string().default("https://api.openai.com/v1"),
+      defaultModel: z.string().default("gpt-4o-mini"),
+    }),
+  }),
   luciverse: z.object({
     coherenceMin: z.coerce.number().min(0).max(1).default(0.7),
     agentsFile: z.string().optional(),
@@ -57,6 +71,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       enabled: env.MATTER_ENABLED,
       wsUrl: env.MATTER_WS_URL,
       commandTimeoutMs: env.MATTER_COMMAND_TIMEOUT_MS,
+    },
+    backends: {
+      default: env.AIFAM_DEFAULT_BACKEND,
+      anthropic: {
+        apiKey: env.ANTHROPIC_API_KEY,
+        baseUrl: env.ANTHROPIC_BASE_URL,
+        defaultModel: env.ANTHROPIC_DEFAULT_MODEL,
+        maxTokens: env.ANTHROPIC_MAX_TOKENS,
+      },
+      openai: {
+        apiKey: env.OPENAI_API_KEY,
+        baseUrl: env.OPENAI_BASE_URL,
+        defaultModel: env.OPENAI_DEFAULT_MODEL,
+      },
     },
     luciverse: {
       coherenceMin: env.LUCIVERSE_COHERENCE_MIN,

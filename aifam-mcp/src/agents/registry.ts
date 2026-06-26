@@ -18,8 +18,10 @@ export interface Agent {
   tier: Tier;
   /** Short description of the agent's role. */
   role: string;
-  /** Preferred model id on the exo mesh (falls back to the mesh default). */
+  /** Preferred model id (falls back to the chosen backend's default). */
   model?: string;
+  /** Preferred backend to route this agent to (falls back to the mesh default). */
+  backend?: string;
   /** Baseline coherence the agent maintains (0..1). */
   coherence: number;
 }
