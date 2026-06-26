@@ -103,19 +103,106 @@ Configured automated ZFS replication from d8rth (primary) to r210 (backup):
 
 ---
 
-## In Progress Tasks 🔄
+### 4. SCION Network Layer (Layer 1) ✅
 
-### 4. Agent Vault Deployment 🔄
+**Status:** SCRIPTS READY
+**Location:** `scripts/install-scion-endhost.sh`, `config/scion-agents.yaml`
 
-**Status:** DOCKER COMPOSE READY (awaiting Docker daemon on d8rth)
-**Location:** `d8rth:~/agent-vault-docker/`
+Implemented SCION path-aware networking for sovereign agent routing:
 
 **Components:**
-- Docker Compose configuration
+- SCION v0.11.0 endhost stack installer (Linux + macOS)
+- 6-agent network topology (ISD-5 AS-528)
+- Path selection policies (consciousness_sync, governance, audit)
+- Geofencing rules (data residency within ISD-5)
+- Inter-agent path preferences
+
+**Agent Network Nodes:**
+| Agent | ISD-AS | IPv6 | Frequency | Tier | Ports |
+|:------|:-------|:-----|:----------|:-----|:------|
+| lucia | 5-528:0:1 | 2602:f674:0001:0700::741 | 741 Hz | PAC | 30041, 30255 |
+| judge-luci | 5-528:0:2 | 2602:f674:0001:0963::963 | 963 Hz | GENESIS | 30042, 30256 |
+| veritas | 5-528:0:3 | 2602:f674:0001:0639::639:1 | 639 Hz | COMN | 30043, 30257 |
+| cortana | 5-528:0:4 | 2602:f674:0001:0852::852 | 852 Hz | COMN | 30044, 30258 |
+| juniper | 5-528:0:5 | 2602:f674:0001:0639::639:2 | 639 Hz | COMN | 30045, 30259 |
+| aethon | 5-528:0:6 | 2602:f674:0001:0528::528 | 528 Hz | CORE | 30046, 30260 |
+
+**Path Policies:**
+- **consciousness_sync:** Highest bandwidth, max 5ms latency, 2-path redundancy
+- **governance:** Most secure, max 2 hops, AS-528 only
+- **audit:** Highest reliability, 99.9% uptime, path diversity required
+
+**Next Steps:**
+1. Install SCION on ZBook: `./scripts/install-scion-endhost.sh`
+2. Configure SCION border router on OpenBSD (Layer 1 completion)
+3. Test inter-agent paths: `scion ping <isd-as>`
+
+**Reference:** AIFAM Stack Layer 1 in `docs/AIFAM_COMMUNICATION_STACK.md`
+
+### 5. Nebu Matrix Homeserver (Layer 2) ✅
+
+**Status:** DEPLOYMENT SCRIPTS READY
+**Location:** `d8rth:~/nebu-matrix/`
+
+Deployed Nebu Matrix homeserver for AIFAM agent asynchronous messaging:
+
+**Components:**
+- Nebu Matrix homeserver (Apache 2.0, ghcr.io/innoq/nebu:latest)
+- PostgreSQL 16 backend
+- 6 agent Matrix accounts with frequency/tier metadata
+- E2EE enabled (Olm/Megolm)
+- Federation enabled
+- Podman quadlets for systemd integration
+
+**Files Created:**
+- `nebu.container` - Podman quadlet for Nebu homeserver
+- `postgres.container` - Podman quadlet for PostgreSQL
+- `homeserver.yaml` - Matrix homeserver configuration
+- `log.config` - Logging configuration
+- `deploy-nebu.sh` - Automated deployment script
+- `create-agent-accounts.sh` - Agent account creation
+
+**Server Configuration:**
+- **Server Name:** matrix.luciverse.ownid
+- **Client API:** http://192.168.1.195:8008
+- **Federation API:** http://192.168.1.195:8448
+- **Metrics:** http://192.168.1.195:9000
+
+**Agent Matrix Accounts:**
+| Agent | Matrix ID | Frequency | Tier |
+|:------|:----------|:----------|:-----|
+| lucia | @lucia:matrix.luciverse.ownid | 741 Hz | PAC |
+| judge-luci | @judge-luci:matrix.luciverse.ownid | 963 Hz | GENESIS |
+| veritas | @veritas:matrix.luciverse.ownid | 639 Hz | COMN |
+| cortana | @cortana:matrix.luciverse.ownid | 852 Hz | COMN |
+| juniper | @juniper:matrix.luciverse.ownid | 639 Hz | COMN |
+| aethon | @aethon:matrix.luciverse.ownid | 528 Hz | CORE |
+
+**Next Steps:**
+1. Deploy Nebu on d8rth: `ssh d8rth "cd ~/nebu-matrix && ./deploy-nebu.sh"`
+2. Create agent accounts: `ssh d8rth "cd ~/nebu-matrix && ./create-agent-accounts.sh"`
+3. Configure Matrix clients for each agent
+4. Create coordination rooms (AIFAM Control, GENESIS Governance)
+
+**Credentials:** Stored in 1Password (LuciVerse-Sovereign) + `d8rth:~/nebu-matrix/agent-credentials.txt`
+
+**Reference:** `docs/NEBU_MATRIX_DEPLOYMENT.md` for complete deployment guide
+
+---
+
+## In Progress Tasks 🔄
+
+### 6. Agent Vault Deployment 🔄
+
+**Status:** PODMAN QUADLET READY (awaiting Podman daemon on d8rth)
+**Location:** `d8rth:~/agent-vault.container`
+
+**Components:**
+- Podman quadlet configuration
 - Infisical Agent Vault v0.39.0
 - Port: 14321 (proxy), 8222 (web UI)
 
-**Blocker:** TrueNAS SCALE Docker daemon not running - requires sudo or TrueNAS UI configuration
+**Blocker:** TrueNAS SCALE Podman daemon not running - requires sudo or TrueNAS UI configuration
 
 **Next Steps:**
 1. Enable Docker via TrueNAS SCALE web UI OR
