@@ -1,0 +1,36 @@
+#!/bin/ksh
+#
+# OpenBSD rc.d(8) daemon script for the Aifam Mesh MCP server (Iris).
+# Install to /etc/rc.d/aifam_mcp, then:
+#   rcctl enable aifam_mcp
+#   rcctl set aifam_mcp flags ""        # optional extra node flags
+#   rcctl start aifam_mcp
+#
+# Runs the server under the dedicated _aifam user over the HTTP transport so
+# remote AI runtimes can reach it. Configuration lives in
+# /etc/aifam_mcp.env (sourced below); see deploy/openbsd/README.md.
+
+daemon_user="_aifam"
+daemon_execdir="/var/aifam-mcp"
+daemon="/usr/local/bin/node"
+daemon_flags="${daemon_execdir}/build/index.js"
+daemon_logger="daemon.info"
+
+. /etc/rc.d/rc.subr
+
+pexp="node.*aifam-mcp/build/index.js"
+
+# Default environment; overridden by /etc/aifam_mcp.env if present.
+rc_env="AIFAM_TRANSPORT=http AIFAM_HTTP_HOST=0.0.0.0 AIFAM_HTTP_PORT=8788"
+
+rc_start() {
+	test -r /etc/aifam_mcp.env && . /etc/aifam_mcp.env
+	${rcexec} "cd ${daemon_execdir}; ${rc_env} exec ${daemon} ${daemon_flags} ${daemon_flags2}"
+}
+
+rc_pre() {
+	[ -x "${daemon}" ] || return 1
+	[ -r "${daemon_execdir}/build/index.js" ] || return 1
+}
+
+rc_cmd $1

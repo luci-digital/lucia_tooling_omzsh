@@ -1,0 +1,56 @@
+{
+  "name": "@luci/aifam-mcp",
+  "version": "0.1.0",
+  "description": "Aifam Mesh MCP (codename Iris) - a runtime-agnostic Model Context Protocol gateway connecting the Luciverse and Aifam agents to distributed inference on exo + MLX clusters and to Matter devices via the Home Assistant Matter Server.",
+  "type": "module",
+  "bin": {
+    "aifam-mcp": "build/index.js"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "files": [
+    "build",
+    "README.md",
+    "ARCHITECTURE.md",
+    ".env.example"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:clean": "rm -rf build && tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node build/index.js",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "inspector": "npx @modelcontextprotocol/inspector node build/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "luciverse",
+    "aifam",
+    "exo",
+    "mlx",
+    "distributed-inference",
+    "matter",
+    "home-assistant"
+  ],
+  "author": "LuciDigital",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ws": "^8.18.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
