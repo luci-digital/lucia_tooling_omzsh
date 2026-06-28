@@ -1979,6 +1979,7 @@ dependencies = [
  "anyhow",
  "blake3",
  "cid",
+ "crc32fast",
  "gix",
  "hex",
  "hyper",

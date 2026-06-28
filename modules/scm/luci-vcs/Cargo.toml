@@ -58,6 +58,7 @@ ipld-core = { version = "0.4", optional = true }
 blake3 = "1.5"        # CAS hashing — 256-bit, parallel
 zstd = "0.13"         # Block compression
 memmap2 = "0.9"       # mmap for cold blocks
+crc32fast = "1"       # WAL entry checksums
 
 # Tracing / observability — tokio.rs/tokio/topics/tracing
 tracing = { version = "0.1", features = ["attributes"] }

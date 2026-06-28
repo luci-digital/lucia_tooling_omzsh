@@ -16,6 +16,12 @@ pub mod web;
 #[cfg(feature = "jj-bridge")]
 pub mod jj_bridge;
 pub mod submodules;
+pub mod lucia_dir;
+pub mod wal;
+pub mod compactor;
+pub mod retention;
+pub mod thread_index;
+pub mod metrics;
 
 use std::net::Ipv6Addr;
 use std::path::Path;
