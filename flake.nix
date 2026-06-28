@@ -53,12 +53,17 @@
           src = ./modules/scm/luci-vcs;
           cargoLock = {
             lockFile = ./modules/scm/luci-vcs/Cargo.lock;
-            # gix git deps (xet-core) are behind off-by-default features.
-            allowBuiltinFetchGit = true;
+            # No git sources in the lock: buildRustPackage vendors the WHOLE lock,
+            # so any git dep would be fetched at vendor time regardless of cargo
+            # features. xet-core (the only one) is pinned out in Cargo.toml, so the
+            # lock stays fully crates.io — reproducible/airgap-friendly, no
+            # allowBuiltinFetchGit needed.
           };
           nativeBuildInputs = vcsNativeBuildInputs;
           buildInputs = vcsBuildInputs;
-          # Default features only (xet/ipfs/ipvm pull unstable upstream deps).
+          # Default features (block-cache/jj-bridge/gitweb). xet/ipfs/ipvm are
+          # optional; xet is pinned out in Cargo.toml (its git dep broke airgapped
+          # vendoring), so the default build is fully self-contained.
           buildNoDefaultFeatures = false;
           doCheck = true;
         };
