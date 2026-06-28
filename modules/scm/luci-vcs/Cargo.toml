@@ -30,8 +30,14 @@ tower-http = { version = "0.6", features = ["fs", "trace"] }
 # Replaces hand-rolled block_cache — production CDC chunking + MerkleHash CAS.
 # Ref: https://github.com/huggingface/xet-core
 # xet-data owns chunking/dedup; xet-client owns the HTTP CAS backend.
-# Pinned: xet-core git dep is unreachable behind proxy; re-enable when
-# running in a network environment that allows github.com/huggingface.
+#
+# PINNED OUT (same pattern as homestar below): these are GIT deps. nix flake
+# check / rustPlatform.buildRustPackage vendors the ENTIRE Cargo.lock, so a git
+# source in the lock is fetched at vendor time regardless of which cargo features
+# are enabled — which breaks reproducible/airgapped builds under restricted
+# egress (the sovereignty goal). The blake3 + zstd + memmap2 fallback CAS below
+# is the working default path. Re-enable + regenerate Cargo.lock once xet-core is
+# vendored locally or egress permits the repo.
 # xet-data = { git = "https://github.com/huggingface/xet-core", optional = true }
 # xet-client = { git = "https://github.com/huggingface/xet-core", optional = true }
 
@@ -88,7 +94,8 @@ default = ["block-cache", "jj-bridge", "gitweb"]
 block-cache = []
 jj-bridge = []
 gitweb = []
-# Enable xet-core backed CAS (production chunking + MerkleHash)
+# Enable xet-core backed CAS (production chunking + MerkleHash) — PINNED OUT
+# with its git deps above (vendored-lock fetch breaks airgapped builds).
 # xet = ["dep:xet-data", "dep:xet-client"]
 # Enable IPFS/IPLD block addressing (CID output from block_cache)
 ipfs = ["dep:cid", "dep:ipld-core"]

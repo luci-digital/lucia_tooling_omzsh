@@ -1,0 +1,62 @@
+name: aifam-mcp CI
+
+# Builds and tests the aifam-mcp package. Scoped to its path so it never
+# overlaps the vendored Oh My Zsh jobs in main.yml.
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - master
+    paths:
+      - "aifam-mcp/**"
+      - ".github/workflows/aifam-mcp.yml"
+  push:
+    branches:
+      - master
+    paths:
+      - "aifam-mcp/**"
+      - ".github/workflows/aifam-mcp.yml"
+
+concurrency:
+  group: aifam-mcp-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+defaults:
+  run:
+    working-directory: aifam-mcp
+
+jobs:
+  build-test:
+    name: type-check, build, test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Set up git repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # ubuntu-latest ships Node 20+, which satisfies the package engines
+      # (>=20). Using the preinstalled runtime keeps the supply-chain posture
+      # clean (no extra action to pin) and reproducible against the runner image.
+      - name: Node version
+        run: node --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
