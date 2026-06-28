@@ -1,0 +1,32 @@
+[lucia]
+version = "0.1.0"
+
+[identity]
+repo_name = "lucia_tooling_omzsh"
+did = "did:luci:lucia-tooling-omzsh"
+frequency_hz = 528
+lds_tier = "800.000"
+genesis_bond = "ACTIVE"
+ipv6_root = "2602:F674:0000:0700::/64"
+
+[peers]
+thunderbolt = { did = "did:lucidigital:luci-ai-thunderbolt", frequency_hz = 741 }
+system_config = { did = "did:lucidigital:luciverse-system-config:fd00:741:1::cab9", frequency_hz = 741 }
+
+[storage]
+block_size = 1048576
+hash = "blake3"
+compression = "zstd"
+compression_level = 3
+
+[wal]
+segment_max_bytes = 67108864
+rotation_count = 8
+
+[compaction]
+interval_hours = 24
+min_block_size = 262144
+
+[network]
+ipv6_root = "2602:F674:0000:0700::/64"
+gitweb_port = 80

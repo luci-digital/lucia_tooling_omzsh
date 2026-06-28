@@ -1,0 +1,7 @@
+[handle]
+repo_name = "lucia_tooling_omzsh"
+did = "did:luci:lucia-tooling-omzsh"
+dns_slug = "lucia-tooling-omzsh"
+frequency_hz = 528
+lds_tier = "800.000"
+genesis_bond_cid = ""

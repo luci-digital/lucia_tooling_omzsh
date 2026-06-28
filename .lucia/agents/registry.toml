@@ -1,0 +1,31 @@
+[registry]
+repo = "lucia_tooling_omzsh"
+frequency_hz = 528
+
+[[agent]]
+name = "veritas"
+did = "did:lucidigital:veritas_truth"
+frequency_hz = 528
+role = "VCS truth verification"
+status = "active"
+
+[[agent]]
+name = "gix-engine"
+did = "did:luci:lucia-tooling-omzsh:gix"
+frequency_hz = 528
+role = "Core git engine"
+status = "active"
+
+[[agent]]
+name = "block-cache"
+did = "did:luci:lucia-tooling-omzsh:cache"
+frequency_hz = 528
+role = "Content-addressed block storage"
+status = "active"
+
+[[agent]]
+name = "lucia-bridge"
+did = "did:luci:lucia-tooling-omzsh:bridge"
+frequency_hz = 741
+role = "Genesis Bond signing bridge"
+status = "active"

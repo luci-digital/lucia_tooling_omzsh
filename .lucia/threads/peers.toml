@@ -1,0 +1,11 @@
+[[peer]]
+name = "luci_AI-thunderbolt"
+did = "did:lucidigital:luci-ai-thunderbolt"
+frequency_hz = 741
+lds_tier = "700.741"
+
+[[peer]]
+name = "luciverse-system-config"
+did = "did:lucidigital:luciverse-system-config:fd00:741:1::cab9"
+frequency_hz = 741
+lds_tier = "000.000.00"
