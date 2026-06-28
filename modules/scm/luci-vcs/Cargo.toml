@@ -30,8 +30,10 @@ tower-http = { version = "0.6", features = ["fs", "trace"] }
 # Replaces hand-rolled block_cache — production CDC chunking + MerkleHash CAS.
 # Ref: https://github.com/huggingface/xet-core
 # xet-data owns chunking/dedup; xet-client owns the HTTP CAS backend.
-xet-data = { git = "https://github.com/huggingface/xet-core", optional = true }
-xet-client = { git = "https://github.com/huggingface/xet-core", optional = true }
+# Pinned: xet-core git dep is unreachable behind proxy; re-enable when
+# running in a network environment that allows github.com/huggingface.
+# xet-data = { git = "https://github.com/huggingface/xet-core", optional = true }
+# xet-client = { git = "https://github.com/huggingface/xet-core", optional = true }
 
 # ── IPFS / IPLD ───────────────────────────────────────────────────────────────
 # CID for content-addressing blocks (wraps any multihash as an IPFS CID).
@@ -50,6 +52,7 @@ ipld-core = { version = "0.4", optional = true }
 blake3 = "1.5"        # CAS hashing — 256-bit, parallel
 zstd = "0.13"         # Block compression
 memmap2 = "0.9"       # mmap for cold blocks
+crc32fast = "1"       # WAL entry checksums
 
 # Tracing / observability — tokio.rs/tokio/topics/tracing
 tracing = { version = "0.1", features = ["attributes"] }
@@ -86,7 +89,7 @@ block-cache = []
 jj-bridge = []
 gitweb = []
 # Enable xet-core backed CAS (production chunking + MerkleHash)
-xet = ["dep:xet-data", "dep:xet-client"]
+# xet = ["dep:xet-data", "dep:xet-client"]
 # Enable IPFS/IPLD block addressing (CID output from block_cache)
 ipfs = ["dep:cid", "dep:ipld-core"]
 # Enable IPVM agent workflow generation (requires ipfs) — pinned until upstream fixes core2 yank
