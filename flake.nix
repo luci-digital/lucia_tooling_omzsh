@@ -36,8 +36,18 @@
         # Optional tools — included only if present + evaluable in this
         # nixpkgs/platform (e.g. foundationdb client, kubo/ipfs). Missing or
         # unsupported attrs are filtered out so the dev shell still builds.
+        # tryEval only guards a MISSING attr; it does not catch a package that
+        # exists but is unsupported on the eval host (e.g. foundationdb on
+        # darwin) — that throws later when mkShell forces it, breaking
+        # `nix flake check --all-systems`. Also gate on lib.meta.availableOn so
+        # unsupported/broken tools are filtered, not exploded.
         tryPkg = name:
-          let r = builtins.tryEval (pkgs.${name} or null);
+          let
+            r = builtins.tryEval (
+              let p = pkgs.${name} or null;
+              in if p != null && lib.meta.availableOn pkgs.stdenv.hostPlatform p
+              then p else null
+            );
           in if r.success then r.value else null;
         optionalTools = builtins.filter (p: p != null)
           (map tryPkg [ "foundationdb" "kubo" ]);
