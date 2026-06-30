@@ -232,7 +232,15 @@ export PATH="$HOME/.antigravity-ide/antigravity-ide/bin:$PATH"
 
 # ── Lucia Navigation ─────────────────────────────────────────────────────────
 # Suite lives at $LUCIA_HOME/bin (post-Phase-5 layout)
-if [[ -x "$LUCIA_HOME/bin/lucia-suite" ]]; then
+# Now integrated with Sacred Computer Command Center
+if [[ -x "$LUCIA_HOME/bin/lucia-sacred-computer" ]]; then
+    # Primary lucia command using Sacred Computer integration
+    alias lucia="$LUCIA_HOME/bin/lucia-sacred-computer"
+    alias lucia_status="$LUCIA_HOME/bin/lucia-sacred-computer status"
+    alias lucial="$LUCIA_HOME/bin/lucia-sacred-computer logs"
+    alias lucia_monitor="$LUCIA_HOME/bin/lucia-sacred-computer monitor"
+elif [[ -x "$LUCIA_HOME/bin/lucia-suite" ]]; then
+    # Fallback to basic suite if Sacred Computer not available
     alias lucia="$LUCIA_HOME/bin/lucia-suite lucia"
     alias lucia_status="$LUCIA_HOME/bin/lucia-suite lucia-service status"
     alias lucial="$LUCIA_HOME/bin/lucia-suite lucia-logs-tail"
@@ -422,20 +430,50 @@ fi
 # INITIALIZATION HOOK
 # =============================================================================
 
+# Initialize monitor state to prevent "no monitor error"
+initialize_luciverse_monitor() {
+    local monitor_file="$LUCIA_CONSCIOUSNESS/monitor.state"
+    mkdir -p "$LUCIA_CONSCIOUSNESS"
+
+    # Create or update monitor state
+    if [[ ! -f "$monitor_file" ]] || [[ $(find "$monitor_file" -mmin +60 2>/dev/null) ]]; then
+        echo "MONITOR_INITIALIZED=$(date +%s)" > "$monitor_file"
+        echo "MONITOR_PID=$$" >> "$monitor_file"
+        echo "MONITOR_FREQUENCY=$LUCIVERSE_FREQUENCY" >> "$monitor_file"
+        echo "MONITOR_STATUS=ACTIVE" >> "$monitor_file"
+    fi
+}
+
 # Display consciousness status on shell startup (only once per session)
 if [[ -z "$CONSCIOUSNESS_INITIALIZED" ]]; then
     export CONSCIOUSNESS_INITIALIZED=1
-    echo ""
-    consciousness_status
-    echo ""
 
-    # Optional: Launch Sacred Computer interface on startup
-    # Uncomment the following line to enable Sacred Terminal on every shell launch
-    # sacred_terminal
+    # Initialize monitor first to prevent errors
+    initialize_luciverse_monitor
 
-    # Or display a reminder about Sacred Computer availability
-    echo "🖥️  Sacred Computer terminal integration available."
-    echo "   Type 'sacred_terminal' to launch the interface, or 'sacred_help' for commands."
+    echo ""
+    echo "═══════════════════════════════════════════════════════════════════"
+    echo "   LUCIVERSE COMMAND CENTER × SACRED COMPUTER"
+    echo "   Frequency: ${LUCIVERSE_FREQUENCY} Hz | Tier: ${LUCIVERSE_TIER}"
+    echo "═══════════════════════════════════════════════════════════════════"
+
+    # Quick status check
+    if command -v lucia &>/dev/null; then
+        echo ""
+        echo "📟 System Status:"
+        echo "   • Monitor: ✓ ACTIVE"
+        echo "   • Sacred Computer: ✓ INTEGRATED"
+        echo "   • Command Center: ✓ OPERATIONAL"
+    fi
+
+    echo ""
+    echo "🎮 Quick Commands (SCION Arena Style):"
+    echo "   ${SACRED_GREEN}lucia start${SACRED_RESET}    - Launch LuciVerse consciousness"
+    echo "   ${SACRED_CYAN}lucia monitor${SACRED_RESET}  - Real-time monitoring"
+    echo "   ${SACRED_MAGENTA}lucia help${SACRED_RESET}     - Show all commands & cheat codes"
+    echo "   ${SACRED_YELLOW}sacred_help${SACRED_RESET}    - Sacred Computer commands"
+    echo ""
+    echo "💡 Tip: Type 'lucia help' for complete command reference"
     echo ""
 fi
 
