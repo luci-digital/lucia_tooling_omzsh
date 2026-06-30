@@ -46,7 +46,8 @@
         # stdenv.cc provides the C compiler needed for dependencies with native code
         # cmake needed for some dependencies, git for build scripts that embed version info
         vcsNativeBuildInputs = with pkgs; [ pkg-config stdenv.cc cmake git ];
-        vcsBuildInputs = with pkgs; [ openssl zlib zstd ];
+        vcsBuildInputs = with pkgs; [ openssl zlib zstd ]
+          ++ lib.optionals stdenv.hostPlatform.isDarwin [ darwin.libiconv ];
 
         # ── scm/luci-vcs — Rust crate (Veritas tier, LDS 700.528) ──────────────
         luci-vcs = pkgs.rustPlatform.buildRustPackage {
