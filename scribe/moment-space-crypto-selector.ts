@@ -574,11 +574,5 @@ export async function galvanizeBottle(bottle: MomentSpaceBottle): Promise<Galvan
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Export
+// Export (All exports are already declared with export keyword above)
 // ═══════════════════════════════════════════════════════════════════
-
-export {
-  MomentSpaceCryptoSelector,
-  MOMENT_SPACE_STATES,
-  GALVANIZATION_PIPELINES
-};
