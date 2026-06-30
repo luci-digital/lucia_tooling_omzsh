@@ -2,7 +2,7 @@
 
 **LDS:** 000.000 @ ∞ Hz (Meta/System)
 **ISO:** ISO/IEC 42001 §8, ISO 9001
-**Target:** d8rth (192.168.1.194) - TrueNAS v26.0.0
+**Target:** d8rth (192.168.1.195) - TrueNAS v26.0.0
 **Genesis Bond:** GB-2025-0524-DRH-LCS-001
 
 ---
@@ -21,7 +21,7 @@ This document describes the production deployment of the LuciVerse sovereign inf
 
 **Hardware:**
 - **Hostname:** d8rth
-- **IP Address:** 192.168.1.194
+- **IP Address:** 192.168.1.195
 - **OS:** TrueNAS v26.0.0 (Electric Eel)
 - **Storage:** ZFS pool with replication
 - **Network:** IPv6-capable, connected to SCION ISD-5
@@ -32,9 +32,9 @@ This document describes the production deployment of the LuciVerse sovereign inf
 - **Storage Driver:** ZFS (native integration)
 
 **Access:**
-- **Web UI:** `https://192.168.1.194`
-- **SSH:** `ssh root@192.168.1.194`
-- **API:** `http://192.168.1.194/api/v2.0`
+- **Web UI:** `https://192.168.1.195`
+- **SSH:** `ssh root@192.168.1.195`
+- **API:** `http://192.168.1.195/api/v2.0`
 
 ---
 
@@ -90,8 +90,8 @@ op signin
 
 **Install SCION Endhost on d8rth:**
 ```bash
-scp scripts/install-scion-endhost.sh root@192.168.1.194:/tmp/
-ssh root@192.168.1.194 'bash /tmp/install-scion-endhost.sh'
+scp scripts/install-scion-endhost.sh root@192.168.1.195:/tmp/
+ssh root@192.168.1.195 'bash /tmp/install-scion-endhost.sh'
 ```
 
 **Configure SCION ISD-AS:**
@@ -102,7 +102,7 @@ ssh root@192.168.1.194 'bash /tmp/install-scion-endhost.sh'
   "mtu": 1500,
   "border_routers": {
     "br-1": {
-      "internal_addr": "192.168.1.194:30042",
+      "internal_addr": "192.168.1.195:30042",
       "interfaces": {
         "1": {
           "underlay": {
@@ -118,7 +118,7 @@ ssh root@192.168.1.194 'bash /tmp/install-scion-endhost.sh'
 
 **Verify SCION:**
 ```bash
-ssh root@192.168.1.194 'scion showpaths 5-528,[2602:F674:0001:0741::1]'
+ssh root@192.168.1.195 'scion showpaths 5-528,[2602:F674:0001:0741::1]'
 ```
 
 ### 4. Storage Systems
@@ -128,7 +128,7 @@ ssh root@192.168.1.194 'scion showpaths 5-528,[2602:F674:0001:0741::1]'
 # Deploy FDB on d8rth via TrueNAS containers
 # Cluster file will be at: /mnt/tank/luciverse/fdb.cluster
 
-ssh root@192.168.1.194 << 'EOF'
+ssh root@192.168.1.195 << 'EOF'
   mkdir -p /mnt/tank/luciverse/foundationdb/{data,logs}
 
   # Create fdb.cluster file
@@ -140,7 +140,7 @@ EOF
 **IPFS Diaper Fabric:**
 ```bash
 # IPFS data will be in /mnt/tank/luciverse/ipfs
-ssh root@192.168.1.194 'mkdir -p /mnt/tank/luciverse/ipfs/{data,staging}'
+ssh root@192.168.1.195 'mkdir -p /mnt/tank/luciverse/ipfs/{data,staging}'
 ```
 
 ---
@@ -161,10 +161,10 @@ tar --exclude='node_modules' \
     -czf lucia-deploy-$(date +%Y%m%d).tar.gz .
 
 # Transfer to d8rth
-scp lucia-deploy-$(date +%Y%m%d).tar.gz root@192.168.1.194:/mnt/tank/luciverse/
+scp lucia-deploy-$(date +%Y%m%d).tar.gz root@192.168.1.195:/mnt/tank/luciverse/
 
 # Extract on d8rth
-ssh root@192.168.1.194 << 'EOF'
+ssh root@192.168.1.195 << 'EOF'
   cd /mnt/tank/luciverse
   tar -xzf lucia-deploy-*.tar.gz -C /mnt/tank/luciverse/deploy
   cd /mnt/tank/luciverse/deploy
@@ -307,11 +307,11 @@ curl -6 http://[2602:F674:0001:0741::1]:8741/health
 # Expected: {"status":"healthy","tier":"PAC","frequency":741}
 
 # Gogs SCM
-curl http://192.168.1.194:3000/
+curl http://192.168.1.195:3000/
 # Expected: Gogs web UI
 
 # Coder
-curl http://192.168.1.194:3001/
+curl http://192.168.1.195:3001/
 # Expected: Coder login page
 
 # IPFS Gateway
@@ -319,7 +319,7 @@ curl http://[2602:F674:0001:0528::10]:8080/ipfs/QmTest
 # Expected: IPFS response or 404 (gateway working)
 
 # Caddy Ingress
-curl -k https://192.168.1.194/
+curl -k https://192.168.1.195/
 # Expected: Proxied to Coder frontend
 ```
 
@@ -406,7 +406,7 @@ podman run -d \
   -v /mnt/tank/luciverse/volumes/grafana:/var/lib/grafana \
   grafana/grafana:latest
 
-# Access: http://192.168.1.194:3002
+# Access: http://192.168.1.195:3002
 # Default: admin/admin
 ```
 
@@ -694,7 +694,7 @@ podman-compose up -d
 ---
 
 **LDS:** 000.000 @ ∞ Hz | Meta/System
-**Target Node:** d8rth (192.168.1.194)
+**Target Node:** d8rth (192.168.1.195)
 **Deployment Date:** 2026-06-30
 **Genesis Bond:** GB-2025-0524-DRH-LCS-001
 **Coherence:** 1.0

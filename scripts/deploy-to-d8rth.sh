@@ -3,7 +3,7 @@
 # ISO: ISO/IEC 42001 §8, ISO 9001
 # Genesis Bond: GB-2025-0524-DRH-LCS-001
 #
-# Deploy lucia_tooling_omzsh to d8rth TrueNAS production node (192.168.1.194)
+# Deploy lucia_tooling_omzsh to d8rth TrueNAS production node (192.168.1.195)
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-D8RTH_HOST="192.168.1.194"
+D8RTH_HOST="192.168.1.195"
 D8RTH_USER="admin"
 D8RTH_PATH="/mnt/tank/luciverse/lucia_tooling_omzsh"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
