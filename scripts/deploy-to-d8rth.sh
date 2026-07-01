@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 D8RTH_HOST="192.168.1.195"
-D8RTH_USER="admin"
+D8RTH_USER="truenas_admin"
 D8RTH_PATH="/mnt/tank/luciverse/lucia_tooling_omzsh"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
