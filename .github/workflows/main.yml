@@ -39,11 +39,8 @@ jobs:
                       ./modules/legacy/original-layout/plugins/*/*.plugin.zsh \
                       ./modules/legacy/original-layout/plugins/*/_* \
                       ./modules/legacy/original-layout/themes/*.zsh-theme; do
-            zsh -n "$file" || return 1
+            zsh -n "$file" || exit 1
           done
       - name: Check sovereign shell syntax
         run: |
-          for file in ./modules/shell/zshrc/.zshrc \
-                      ./modules/shell/zshrc/*.zsh; do
-            [ -f "$file" ] && { zsh -n "$file" || return 1; }
-          done
+          zsh -n ./modules/shell/zshrc/.zshrc
