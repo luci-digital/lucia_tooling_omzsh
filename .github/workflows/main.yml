@@ -21,7 +21,7 @@ jobs:
   tests:
     name: Run tests
     runs-on: ubuntu-latest
-    if: github.repository == 'ohmyzsh/ohmyzsh'
+    if: github.repository == 'luci-digital/lucia_tooling_omzsh'
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -32,12 +32,15 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Install zsh
         run: sudo apt-get update; sudo apt-get install zsh
-      - name: Check syntax
+      - name: Check legacy OMZ syntax
         run: |
-          for file in ./oh-my-zsh.sh \
-                      ./lib/*.zsh \
-                      ./plugins/*/*.plugin.zsh \
-                      ./plugins/*/_* \
-                      ./themes/*.zsh-theme; do
-            zsh -n "$file" || return 1
+          for file in ./modules/legacy/original-layout/oh-my-zsh.sh \
+                      ./modules/legacy/original-layout/lib/*.zsh \
+                      ./modules/legacy/original-layout/plugins/*/*.plugin.zsh \
+                      ./modules/legacy/original-layout/plugins/*/_* \
+                      ./modules/legacy/original-layout/themes/*.zsh-theme; do
+            zsh -n "$file" || exit 1
           done
+      - name: Check sovereign shell syntax
+        run: |
+          zsh -n ./modules/shell/zshrc/.zshrc
