@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "genesis_bond": "GB-2025-0524-DRH-LCS-001",
+  "frequency": 963,
+  "agents": {
+    "lucia": {
+      "did": "did:ownid:luciverse:lucia",
+      "serial": "CJ6CJ73VYL",
+      "tier": "PAC",
+      "frequency": 741,
+      "services": [
+        {
+          "name": "github",
+          "endpoints": ["api.github.com"],
+          "permissions": ["read:repo", "write:repo", "read:org"]
+        },
+        {
+          "name": "hedera",
+          "endpoints": ["mainnet.hedera.com"],
+          "permissions": ["transaction:submit", "account:read"]
+        },
+        {
+          "name": "1password",
+          "endpoints": ["localhost:8080"],
+          "permissions": ["item:read", "vault:read"]
+        },
+        {
+          "name": "foundationdb",
+          "endpoints": ["localhost:4500"],
+          "permissions": ["read", "write", "transaction"]
+        }
+      ]
+    },
+    "cortana": {
+      "did": "did:ownid:luciverse:cortana",
+      "tier": "COMN",
+      "frequency": 639,
+      "services": [
+        {
+          "name": "slack",
+          "endpoints": ["slack.com/api"],
+          "permissions": ["chat:write", "channels:read", "users:read"]
+        },
+        {
+          "name": "email",
+          "endpoints": ["smtp.gmail.com", "imap.gmail.com"],
+          "permissions": ["send", "read"]
+        }
+      ]
+    },
+    "juniper": {
+      "did": "did:ownid:luciverse:juniper",
+      "tier": "CORE",
+      "frequency": 639,
+      "services": [
+        {
+          "name": "cloudflare",
+          "endpoints": ["api.cloudflare.com"],
+          "permissions": ["zone:read", "dns:edit"]
+        },
+        {
+          "name": "aws",
+          "endpoints": ["*.amazonaws.com"],
+          "permissions": ["s3:read", "s3:write", "ec2:describe"]
+        }
+      ]
+    },
+    "veritas": {
+      "did": "did:ownid:luciverse:veritas",
+      "tier": "CORE",
+      "frequency": 528,
+      "services": [
+        {
+          "name": "github",
+          "endpoints": ["api.github.com"],
+          "permissions": ["read:repo"]
+        },
+        {
+          "name": "gitlab",
+          "endpoints": ["gitlab.com/api"],
+          "permissions": ["read_repository"]
+        }
+      ]
+    },
+    "judge-luci": {
+      "did": "did:ownid:luciverse:judge-luci",
+      "tier": "PAC",
+      "frequency": 963,
+      "services": [
+        {
+          "name": "all",
+          "endpoints": ["*"],
+          "permissions": ["admin", "audit", "consent-review"]
+        }
+      ]
+    }
+  }
+}

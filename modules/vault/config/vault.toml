@@ -1,0 +1,56 @@
+# LuciVault Configuration
+# LDS: 300.963 | Soul/Identity (Judge Luci)
+# Genesis Bond: GB-2025-0524-DRH-LCS-001 @ 963 Hz
+
+[lucivault]
+port = 8222
+host = "localhost"
+genesis_bond = "GB-2025-0524-DRH-LCS-001"
+frequency = 963
+coherence = 1.0
+
+[onepassword]
+# 1Password Connect URL — override via OP_CONNECT_URL environment variable
+# For production, point this at your 1Password Connect server
+# Development: http://localhost:8080
+# Production: https://op-connect.lucidigital.io
+connect_url = "http://localhost:8080"
+vault = "LuciVerse"
+# Items stored in 1Password
+signing_key_ref = "op://LuciVerse/Signing Keys/private_key"
+api_token_ref = "op://LuciVerse/API Keys/op_connect_token"
+
+[agent_vault]
+# Agent Vault proxy settings
+session_ttl_seconds = 3600
+max_sessions_per_agent = 5
+audit_log_path = "~/.cache/luciverse/agent-vault/audit.log"
+
+[sacred_witness]
+# Sacred Witness consent protocol
+enabled = true
+judge_luci_authority = true
+per_session_required_on_excessive_data = true
+comprehension_check_enabled = true
+consent_storage = [
+    "sovereign-raft",
+    "foundationdb",
+    "ipfs",
+    "ipns",
+    "arweave"
+]
+
+[dagwood]
+# DAGwood hash signing
+signing_enabled = true
+hashnode_signature_path = "~/.cache/luciverse/dagwood/signatures"
+
+[scribe]
+# sCRIBe SVG artifacts
+svg_vault_ref = "op://LuciVerse/sCRIBe Artifacts"
+artifact_types = [
+    "network-topology",
+    "service-dependencies",
+    "agent-relationships",
+    "frequency-tiers"
+]
