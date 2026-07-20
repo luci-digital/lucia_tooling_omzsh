@@ -1,0 +1,19 @@
+{
+  "_comment": "Copy to your project root as .mcp.json (Claude Code) to register luci-mcp. Uses cargo run so it builds on first launch.",
+  "mcpServers": {
+    "luci-mcp": {
+      "command": "cargo",
+      "args": [
+        "run",
+        "--quiet",
+        "--manifest-path",
+        "core/vcs/Cargo.toml",
+        "--bin",
+        "luci-mcp",
+        "--features",
+        "mcp"
+      ],
+      "env": {}
+    }
+  }
+}
