@@ -10,6 +10,10 @@ frequency = 963
 coherence = 1.0
 
 [onepassword]
+# 1Password Connect URL — override via OP_CONNECT_URL environment variable
+# For production, point this at your 1Password Connect server
+# Development: http://localhost:8080
+# Production: https://op-connect.lucidigital.io
 connect_url = "http://localhost:8080"
 vault = "LuciVerse"
 # Items stored in 1Password

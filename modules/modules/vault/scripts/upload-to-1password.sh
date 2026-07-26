@@ -43,29 +43,57 @@ echo "   (Key already exists)"
 
 # Create or update r210 item
 echo "📝 Creating r210 TrueNAS item..."
-op item create \
-  --category=server \
-  --title="r210 TrueNAS" \
-  --vault="LuciVerse" \
-  --tags="truenas,core,528hz,backup" \
-  "hostname=r210" \
-  "ip_address=192.168.1.193" \
-  "ipv6=2602:f674:0001:core::193" \
-  "ssh_user=truenas_admin" \
-  "password=Newdaryl24!" \
-  "role=storage-backup" \
-  "tier=CORE" \
-  "frequency=528" \
-  "git_remote=ssh://r210/~/git/lucia_tooling_omzsh.git" \
-  2>/dev/null || \
-op item edit "r210 TrueNAS" \
-  --vault="LuciVerse" \
-  "hostname=r210" \
-  "ip_address=192.168.1.193" \
-  "ipv6=2602:f674:0001:core::193" \
-  "ssh_user=truenas_admin" \
-  "password=Newdaryl24!" \
-  "role=storage-backup"
+
+# Read password from 1Password if updating, or prompt if creating new
+if op item get "r210 TrueNAS" --vault="LuciVerse" &>/dev/null; then
+  echo "   (Item exists, password preserved)"
+  op item edit "r210 TrueNAS" \
+    --vault="LuciVerse" \
+    "hostname=r210" \
+    "ip_address=192.168.1.193" \
+    "ipv6=2602:f674:0001:core::193" \
+    "ssh_user=truenas_admin" \
+    "role=storage-backup"
+else
+  echo "   Creating new item - password will be set interactively or via op:// reference"
+  echo "   Please ensure r210 TrueNAS password is stored in 1Password before running this script"
+  echo "   or set R210_PASSWORD environment variable"
+
+  # Use environment variable if set, otherwise skip password (add manually)
+  if [ -n "$R210_PASSWORD" ]; then
+    op item create \
+      --category=server \
+      --title="r210 TrueNAS" \
+      --vault="LuciVerse" \
+      --tags="truenas,core,528hz,backup" \
+      "hostname=r210" \
+      "ip_address=192.168.1.193" \
+      "ipv6=2602:f674:0001:core::193" \
+      "ssh_user=truenas_admin" \
+      "password=$R210_PASSWORD" \
+      "role=storage-backup" \
+      "tier=CORE" \
+      "frequency=528" \
+      "git_remote=ssh://r210/~/git/lucia_tooling_omzsh.git" \
+      2>/dev/null
+  else
+    op item create \
+      --category=server \
+      --title="r210 TrueNAS" \
+      --vault="LuciVerse" \
+      --tags="truenas,core,528hz,backup" \
+      "hostname=r210" \
+      "ip_address=192.168.1.193" \
+      "ipv6=2602:f674:0001:core::193" \
+      "ssh_user=truenas_admin" \
+      "role=storage-backup" \
+      "tier=CORE" \
+      "frequency=528" \
+      "git_remote=ssh://r210/~/git/lucia_tooling_omzsh.git" \
+      2>/dev/null
+    echo "   ⚠️  Password not set - add manually: op item edit 'r210 TrueNAS' password=<value>"
+  fi
+fi
 
 # Upload r210 SSH private key
 echo "🔑 Uploading r210 SSH key..."

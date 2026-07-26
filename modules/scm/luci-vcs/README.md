@@ -44,14 +44,87 @@ is the agent that holds truth without coercion — so the VCS substrate runs at
 
 ```
 core/vcs/
-├── Cargo.toml          # workspace manifest — gix, prodash, tokio, jj-lib
+├── Cargo.toml          # workspace manifest — gix, prodash, tokio, jj-lib, rmcp
 ├── src/
 │   ├── lib.rs          # public API — Repository, BlockCache, Bridge
+│   ├── handle.rs       # DID handle parser/verifier + NoZero base-9 codec (LDS 200.741)
 │   ├── block_cache.rs  # XetHub-style CAS (content-addressed storage)
 │   ├── jj_bridge.rs    # jj-vcs invocation wrapper
 │   ├── submodules.rs   # gix-based submodule resolution
-│   └── web.rs          # gitweb-compatible tokio HTTP handler
+│   ├── web.rs          # gitweb-compatible tokio HTTP handler
+│   └── bin/
+│       ├── main.rs     # luci-vcs operator CLI
+│       ├── vanity.rs   # vanity tag miner CLI
+│       └── mcp.rs      # luci-mcp — MCP server (stdio) for Claude / Zed / Inspector
 └── README.md
 ```
 
 Companion file: `orchestration/lds_lineage/scm/gitweb.conf`
+
+## MCP Server (`luci-mcp`)
+
+`luci-mcp` exposes the Rust core to MCP-capable agents — Claude Code/Desktop,
+Zed (via ACP/`context_servers`), and the MCP Inspector — over stdio using the
+official [`rmcp`](https://crates.io/crates/rmcp) SDK. It is gated behind the
+`mcp` cargo feature so the default substrate build stays lean.
+
+### Build & run
+
+```sh
+cargo build --release --bin luci-mcp --features mcp
+./target/release/luci-mcp        # speaks JSON-RPC on stdin/stdout; logs to stderr
+```
+
+### Tools
+
+| Group | Tool | Purpose |
+|---|---|---|
+| DID handles | `handle_parse` | Parse `<given> <tag> <family>` → components + canonical/display/dns-slug |
+| | `handle_verify` | Check a handle's tag against an Ed25519 pubkey (hex) |
+| | `handle_tag_for_key` | Derive the 4-digit NoZero tag for a pubkey |
+| | `handle_mine_vanity` | Mine a pubkey whose tag matches a target (~6561 trials) |
+| NoZero codec | `base9_encode` | Encode a u32 as fixed-width NoZero base-9 (digits 1–9) |
+| | `base9_decode` | Decode a NoZero base-9 string → u32 |
+| Substrate | `vcs_info` | LDS tier, Veritas frequency, IPv6 root, component addressing |
+
+### Wire into Zed
+
+`~/.config/zed/settings.json`:
+
+```jsonc
+{
+  "context_servers": {
+    "luci-mcp": {
+      "source": "custom",
+      "command": "/absolute/path/to/target/release/luci-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
+```
+
+### Wire into Claude Code
+
+```sh
+claude mcp add luci-mcp /absolute/path/to/target/release/luci-mcp
+```
+
+Or in `claude_desktop_config.json` / project `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "luci-mcp": { "command": "/absolute/path/to/target/release/luci-mcp", "args": [] }
+  }
+}
+```
+
+### Quick check with the MCP Inspector
+
+```sh
+npx @modelcontextprotocol/inspector ./target/release/luci-mcp
+```
+
+> Note: the `mcp` feature is independent of the optional `xet` feature. Building
+> with `--features xet` requires network access to the `xet-core` git source.

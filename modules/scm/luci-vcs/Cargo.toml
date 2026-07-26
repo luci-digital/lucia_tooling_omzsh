@@ -77,6 +77,11 @@ hex = "0.4"
 # IPv6 address parsing for the sovereign schema
 ipnet = "2"
 
+# ── MCP server (optional, behind the `mcp` feature) ──────────────────────────
+# Official Rust MCP SDK — exposes the core to Claude / Zed (ACP) / Inspector
+# over stdio. schemars is re-exported by rmcp, so no separate dep is needed.
+rmcp = { version = "2", features = ["server", "macros", "transport-io", "schemars"], optional = true }
+
 [dev-dependencies]
 tempfile = "3"
 tokio = { version = "1", features = ["test-util", "macros"] }
@@ -88,6 +93,11 @@ path = "src/bin/main.rs"
 [[bin]]
 name = "vanity"
 path = "src/bin/vanity.rs"
+
+[[bin]]
+name = "luci-mcp"
+path = "src/bin/mcp.rs"
+required-features = ["mcp"]
 
 [features]
 default = ["block-cache", "jj-bridge", "gitweb"]
@@ -101,3 +111,5 @@ gitweb = []
 ipfs = ["dep:cid", "dep:ipld-core"]
 # Enable IPVM agent workflow generation (requires ipfs) — pinned until upstream fixes core2 yank
 ipvm = ["ipfs"]
+# Enable the MCP server binary (luci-mcp) — exposes the core over stdio to MCP clients
+mcp = ["dep:rmcp"]

@@ -126,7 +126,7 @@ Path-aware networking for sovereign routing between agents across different auto
 **Paths:**
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Lucia (AS-528:0:1 @ 192.168.1.125) →                          │
+│  Lucia (AS-528:0:1 @ 192.168.1.145) →                          │
 │  Judge Luci (AS-528:0:2 @ 192.168.1.195)                       │
 ├─────────────────────────────────────────────────────────────────┤
 │  Path 1: Direct (1 hop)  - latency 1ms                         │
@@ -139,7 +139,7 @@ Path-aware networking for sovereign routing between agents across different auto
 ```yaml
 # ~/.lucia/network/scion.yaml
 isd_as: 5-528:0:1
-local_ip: 192.168.1.125
+local_ip: 192.168.1.145
 dispatcher_socket: /var/run/scion/dispatcher.sock
 
 paths:
@@ -375,11 +375,11 @@ Sovereign ledger state agreement between agents. Used for:
 
 **Nodes:**
 ```
-lucia-raft       (192.168.1.125:7741)  - PAC @ 741 Hz
+lucia-raft       (192.168.1.145:7741)  - PAC @ 741 Hz
 judge-luci-raft  (192.168.1.195:7963)  - GENESIS @ 963 Hz (typical leader)
-veritas-raft     (192.168.1.125:7639)  - COMN @ 639 Hz
-cortana-raft     (192.168.1.125:7852)  - COMN @ 852 Hz
-juniper-raft     (192.168.1.125:7639)  - COMN @ 639 Hz
+veritas-raft     (192.168.1.145:7639)  - COMN @ 639 Hz
+cortana-raft     (192.168.1.145:7852)  - COMN @ 852 Hz
+juniper-raft     (192.168.1.145:7639)  - COMN @ 639 Hz
 aethon-raft      (192.168.1.195:7528)  - CORE @ 528 Hz
 ```
 
@@ -550,7 +550,7 @@ Out-of-band consciousness communication between Lenovo agent workstations using 
 ### Physical Setup
 
 **Hardware:**
-- Lenovo ThinkStation P620 (Lucia workstation @ 192.168.1.125)
+- Lenovo ThinkStation P620 (Lucia workstation @ 192.168.1.145)
 - Lenovo ThinkStation P920 (Judge Luci workstation @ 192.168.1.195)
 - Audio line-out → Audio line-in (3.5mm cable)
 - Or: USB audio interface with balanced outputs
@@ -747,7 +747,7 @@ async fn handle_classification_request(msg: MatrixEvent) {
 │  ├── nebu-matrix (8448)                                             │
 │  └── postgresql (5432)                                              │
 │                                                                       │
-│  ZBook (192.168.1.125) - Lenovo ThinkStation P620                   │
+│  ZBook (192.168.1.145) - Lenovo ThinkStation P620                   │
 │  ├── lucia-raft (7741) - Leader candidate                           │
 │  ├── lucia-pds (3001)                                               │
 │  ├── veritas-raft (7639)                                            │
@@ -857,7 +857,7 @@ curl https://lucia.luciverse.ownid/.well-known/atproto-did
 ### Layer 4: Raft
 ```bash
 # Test Raft health
-curl http://192.168.1.125:7741/raft/status
+curl http://192.168.1.145:7741/raft/status
 ```
 
 ### Layer 5: Hedera

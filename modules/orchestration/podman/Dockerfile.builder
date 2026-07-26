@@ -1,70 +1,51 @@
-# ============================================================================
-# Lucia Build Agent — xmake + Cargo + Lua + gix
-# Podman sidecar that runs scm-ci pipeline builds.
-#
-# Principle #5: Airgap-First — all tools vendored in image
-# Principle #6: No Docker — built with podman/buildah
-# Principle #11: Sovereign SCM — reads Gogs repos via shared volume
-# Genesis Bond: ACTIVE @ 741 Hz
-# ============================================================================
+# LuciVerse Build Agent - SCM CI Pipeline
+# LDS: 700.528 | VCS Build Infrastructure (CORE Tier)
+# Genesis Bond: GB-2025-0524-DRH-LCS-001
 
-FROM rust:1.93-slim-bookworm AS builder
+FROM rust:1.85-slim-bookworm
 
-# Install system deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
+LABEL maintainer="LuciVerse <ops@lucidigital.io>"
+LABEL lds.tier="CORE"
+LABEL lds.frequency="528"
+LABEL lds.code="700.528"
+LABEL description="Build Agent with xmake, Cargo, Lua, and gix"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
     pkg-config \
-    curl \
     git \
-    lua5.4 \
-    liblua5.4-dev \
-    luajit \
-    nodejs \
-    npm \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install xmake
-RUN curl -fsSL https://xmake.io/shget.text | bash -s v2.9.8 \
-    && ln -sf /root/.local/bin/xmake /usr/local/bin/xmake
-
-# Install gitoxide
-RUN cargo install gitoxide --features max-pure --locked \
-    && cp /usr/local/cargo/bin/gix /usr/local/bin/gix \
-    && cp /usr/local/cargo/bin/ein /usr/local/bin/ein
-
-# ============================================================================
-# Runtime stage — minimal image with just the tools
-# ============================================================================
-FROM debian:bookworm-slim
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    lua5.4 \
-    luajit \
     curl \
+    wget \
+    liblua5.4-dev \
+    lua5.4 \
+    luajit \
+    unzip \
     ca-certificates \
-    nodejs \
-    npm \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy tools from builder
-COPY --from=builder /usr/local/bin/gix /usr/local/bin/gix
-COPY --from=builder /usr/local/bin/ein /usr/local/bin/ein
-COPY --from=builder /usr/local/bin/xmake /usr/local/bin/xmake
-COPY --from=builder /root/.local/share/xmake /root/.local/share/xmake
+# Note: Additional tools (xmake, gitoxide/gix, cargo-watch) can be installed later
+# via cargo install or package managers. Keeping initial image lightweight for faster builds.
 
-# Gogs repo data mounted read-only at runtime
-VOLUME ["/gogs-data"]
+# Create workspace directories
+RUN mkdir -p /workspace/compositor /workspace/lua-substrate /gogs-data
 
-# Health check — verify all tools present
-HEALTHCHECK --interval=60s --timeout=5s --retries=2 \
-    CMD gix --version && xmake --version && lua5.4 -v
+# Set working directory
+WORKDIR /workspace
 
-# Default: run the full scm-ci pipeline
-ENTRYPOINT ["xmake", "build"]
-CMD ["scm-ci"]
+# Create non-root build user
+RUN useradd -m -u 1000 builder && \
+    chown -R builder:builder /workspace
 
-LABEL maintainer="Luci Digital <lucia@lucidigital.net>"
-LABEL description="Lucia Build Agent — xmake + Cargo + Lua + gix"
-LABEL genesis.bond="ACTIVE"
-LABEL genesis.frequency="741"
+USER builder
+
+# Expose build agent port (8742)
+EXPOSE 8742
+
+# Health check using cargo
+HEALTHCHECK --interval=60s --timeout=5s --start-period=10s --retries=2 \
+    CMD cargo --version || exit 1
+
+# Default command (keeps container running for build jobs)
+CMD ["sh", "-c", "echo 'Build Agent ready. Waiting for build jobs...' && tail -f /dev/null"]

@@ -43,9 +43,7 @@ services:
   # 2) LUCIA ORCHESTRATOR: Genesis Drop Box (741 Hz)
   # ---------------------------------------------------------------------
   lucia-orchestrator:
-    build:
-      context: /Users/darylharr/lucia/luciverse-monorepo/luciverse-core-orchestrator
-      dockerfile: Dockerfile
+    image: lucia/orchestrator:latest
     container_name: lucia
     restart: unless-stopped
     depends_on:
@@ -95,6 +93,8 @@ services:
     ports:
       - "8265:8265"
       - "6378:6379" # Changed to 6378 to avoid conflict with host Redis
+    # Note: Health check disabled - container doesn't have curl/wget
+    # Dashboard is accessible at http://localhost:8265
 
   # ---------------------------------------------------------------------
   # 6) CADDY: The Sovereign Ingress Gateway (IPv6-native, no host ports)
@@ -122,9 +122,6 @@ services:
   # Principle #11: Reads Gogs repo data via shared gogs-data volume
   # ---------------------------------------------------------------------
   build-agent:
-    build:
-      context: .
-      dockerfile: Dockerfile.builder
     image: lucia/build-agent:latest
     container_name: build-agent
     restart: "no"
@@ -135,12 +132,12 @@ services:
       - fusion-net
     volumes:
       - gogs-data:/gogs-data:ro
-      - /Users/darylharr/lucia_compositor:/workspace/compositor:ro
-      - /Users/darylharr/lua-substrate:/workspace/lua-substrate:ro
+      - ${LUCIA_COMPOSITOR_PATH:-~/lucia_compositor}:/workspace/compositor:ro
+      - ${LUA_SUBSTRATE_PATH:-~/lua-substrate}:/workspace/lua-substrate:ro
     ports:
       - "8742:8742"
     healthcheck:
-      test: ["CMD", "gix", "--version"]
+      test: ["CMD", "cargo", "--version"]
       interval: 60s
       timeout: 5s
       retries: 2
@@ -162,7 +159,7 @@ services:
     networks:
       - fusion-net
     ports:
-      - "8090:8090"
+      - "8090:8080"   # App listens on 8080 internally
     environment:
       # AI Model config — default to local Ollama (airgap-first)
       - CHAT_MODEL=${ODW_CHAT_MODEL:-llama3.2}
@@ -187,12 +184,8 @@ services:
       - MCP_STREAMABLE=lucia=http://opendeepwiki:8090/api/mcp
     volumes:
       - opendeepwiki-data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8090/"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+    # Note: Health check disabled - minimal .NET container doesn't have curl/wget/nc
+    # App listens on port 8080, accessible at http://localhost:8090
 
   # ---------------------------------------------------------------------
   # 9) CODER: Self-hosted CDE platform (Gitpod-equivalent)
@@ -247,8 +240,8 @@ services:
       CODER_GITAUTH_0_TOKEN_URL: "http://scm-engine:3000/login/oauth/access_token"
       CODER_GITAUTH_0_VALIDATE_URL: "http://scm-engine:3000/api/v1/user"
     volumes:
-      # Podman socket for workspace container provisioning
-      - /run/user/1000/podman/podman.sock:/var/run/docker.sock:ro
+      # Podman socket for workspace container provisioning (macOS uses UID 501)
+      - /run/user/501/podman/podman.sock:/var/run/docker.sock:ro
       - coder-data:/home/coder/.config
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7080/healthz"]
@@ -271,8 +264,9 @@ services:
     networks:
       - fusion-net
     ports:
-      - "7000:7000"   # IPVM task submission API
-      - "7001:7001"   # Homestar metrics / health
+      - "7100:7000"   # IPVM task submission API (host 7100 to avoid macOS Control Center on 7000)
+      - "7101:7001"   # Homestar metrics / health
+      - "3030:3030"   # RPC server for health checks
     environment:
       # Point at local IPFS node for block exchange
       HOMESTAR_NETWORK__IPFS_HOST: "host.containers.internal"
@@ -283,12 +277,8 @@ services:
       HOMESTAR_WORKFLOW__RECEIPTS_ENABLED: "true"
     volumes:
       - homestar-data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7001/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 20s
+    # Note: Health check disabled - distroless container doesn't have shell/curl/wget
+    # RPC server listens on 3030, webserver on 1337
 
   # ---------------------------------------------------------------------
   # 11) IPFS (Kubo): Block storage backend

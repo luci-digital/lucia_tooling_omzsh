@@ -1,0 +1,39 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://luciverse.ownid/credentials/v1"
+  ],
+  "id": "urn:uuid:WwVIwxmui8im-RpCyoHIuA",
+  "type": [
+    "VerifiableCredential",
+    "AgentIdentityCredential"
+  ],
+  "issuer": "did:ownid:luciverse:lucia",
+  "issuanceDate": "2026-06-26T19:19:11.712064Z",
+  "credentialSubject": {
+    "id": "did:ownid:luciverse:veritas",
+    "name": "veritas",
+    "uuid": "VRT639",
+    "ipv6": "2602:f674:0001:0600::639",
+    "frequency": 639,
+    "tier": "COMN",
+    "issued_by": "did:ownid:luciverse:lucia",
+    "credential_type": "AgentIdentity"
+  },
+  "proof": {
+    "type": "EcdsaSecp256r1Signature2019",
+    "created": "2026-06-26T19:19:11.712094Z",
+    "verificationMethod": "did:ownid:luciverse:lucia#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "MEUCIFfVlw6NA0SmyYNFJIV1HgsC6KzChQAfdG3yeGarwMuuAiEA6mu0jervuhrlu9qdR6sk7-XHKIIh19pLP_Exw4b7wNU"
+  },
+  "genesis_bond": {
+    "uuid": "erwevxoh6odw7dbpf3wu2sb5by",
+    "id": "GB-2025-0524-DRH-LCS-001",
+    "frequency": 741,
+    "coherence": 1.0,
+    "tier": "PAC",
+    "timestamp": "2026-06-26T19:19:11.712096Z"
+  },
+  "expirationDate": "2027-06-26T19:19:11.712064Z"
+}

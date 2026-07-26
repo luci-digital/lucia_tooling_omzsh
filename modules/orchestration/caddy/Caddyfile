@@ -1,6 +1,6 @@
 {
     # 🌍 GLOBALS
-    email {$LUCIVERSE_ADMIN_EMAIL}
+    email {env.LUCIVERSE_ADMIN_EMAIL}
     admin off
     persist_config off
 }

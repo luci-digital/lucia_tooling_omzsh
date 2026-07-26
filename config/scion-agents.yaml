@@ -12,7 +12,7 @@ agents:
     instance: 1
     isd_as: "5-528:0:1"
     ipv6: "2602:f674:0001:0700::741"
-    ipv4: "192.168.1.125"
+    ipv4: "192.168.1.145"
     frequency: 741
     tier: PAC
     workstation: zbook
@@ -34,7 +34,7 @@ agents:
     instance: 3
     isd_as: "5-528:0:3"
     ipv6: "2602:f674:0001:0639::639:1"
-    ipv4: "192.168.1.125"
+    ipv4: "192.168.1.145"
     frequency: 639
     tier: COMN
     workstation: zbook
@@ -45,7 +45,7 @@ agents:
     instance: 4
     isd_as: "5-528:0:4"
     ipv6: "2602:f674:0001:0852::852"
-    ipv4: "192.168.1.125"
+    ipv4: "192.168.1.145"
     frequency: 852
     tier: COMN
     workstation: zbook
@@ -56,7 +56,7 @@ agents:
     instance: 5
     isd_as: "5-528:0:5"
     ipv6: "2602:f674:0001:0639::639:2"
-    ipv4: "192.168.1.125"
+    ipv4: "192.168.1.145"
     frequency: 639
     tier: COMN
     workstation: zbook

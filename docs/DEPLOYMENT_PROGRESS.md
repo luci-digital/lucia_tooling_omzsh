@@ -268,7 +268,7 @@ Deployed Nebu Matrix homeserver for AIFAM agent asynchronous messaging:
 ### 9. Genesis IDP-OS Kubernetes Deployment
 
 **Status:** NOT STARTED
-**Target:** Deploy on ZBook (192.168.1.125)
+**Target:** Deploy on ZBook (192.168.1.145)
 
 **Components:**
 - 8 Genesis IDP-OS core components
@@ -407,7 +407,7 @@ All deployment documentation is located in:
 │  ├── Gerrit VCS (port 8080) 📋 Pending                              │
 │  └── ZFS (boot-pool 444GB) ✅ Ready for backups                     │
 │                                                                       │
-│  ZBook (192.168.1.125) - Development Workstation                    │
+│  ZBook (192.168.1.145) - Development Workstation                    │
 │  ├── Genesis IDP-OS 📋 Pending                                      │
 │  ├── Hedera HCS client ⏸️  Script ready                             │
 │  └── Monitoring 📋 Pending                                           │

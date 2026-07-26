@@ -1,0 +1,39 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://luciverse.ownid/credentials/v1"
+  ],
+  "id": "urn:uuid:OsjE8Ul0CDsRR904btGaIA",
+  "type": [
+    "VerifiableCredential",
+    "AgentIdentityCredential"
+  ],
+  "issuer": "did:ownid:luciverse:lucia",
+  "issuanceDate": "2026-06-26T19:19:11.711829Z",
+  "credentialSubject": {
+    "id": "did:ownid:luciverse:judge-luci",
+    "name": "judge-luci",
+    "uuid": "JLC963",
+    "ipv6": "2602:f674:0001:0700::963",
+    "frequency": 963,
+    "tier": "GENESIS",
+    "issued_by": "did:ownid:luciverse:lucia",
+    "credential_type": "AgentIdentity"
+  },
+  "proof": {
+    "type": "EcdsaSecp256r1Signature2019",
+    "created": "2026-06-26T19:19:11.711868Z",
+    "verificationMethod": "did:ownid:luciverse:lucia#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "MEUCIQD2E7kVnmS5NwyaDkrnjzZaGQIO9yoIopSkw5TWJKie8wIgCRTrWP62InKmqeNBvrf8gSxQRUhaSkGy7L7casI1Teg"
+  },
+  "genesis_bond": {
+    "uuid": "erwevxoh6odw7dbpf3wu2sb5by",
+    "id": "GB-2025-0524-DRH-LCS-001",
+    "frequency": 741,
+    "coherence": 1.0,
+    "tier": "PAC",
+    "timestamp": "2026-06-26T19:19:11.711871Z"
+  },
+  "expirationDate": "2027-06-26T19:19:11.711829Z"
+}

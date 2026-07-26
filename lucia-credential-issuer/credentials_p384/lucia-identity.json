@@ -1,0 +1,39 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://luciverse.ownid/credentials/v1"
+  ],
+  "id": "urn:uuid:aF83lqL9FPbEblhEEur8Iw",
+  "type": [
+    "VerifiableCredential",
+    "AgentIdentityCredential"
+  ],
+  "issuer": "did:ownid:luciverse:lucia",
+  "issuanceDate": "2026-06-26T19:19:11.710569Z",
+  "credentialSubject": {
+    "id": "did:ownid:luciverse:lucia",
+    "name": "lucia",
+    "uuid": "CJ6CJ73VYL",
+    "ipv6": "2602:f674:0001:0700::741",
+    "frequency": 741,
+    "tier": "PAC",
+    "issued_by": "did:ownid:luciverse:lucia",
+    "credential_type": "AgentIdentity"
+  },
+  "proof": {
+    "type": "EcdsaSecp256r1Signature2019",
+    "created": "2026-06-26T19:19:11.711492Z",
+    "verificationMethod": "did:ownid:luciverse:lucia#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "MEUCIQCvNkg0HiEHhQkraYJtFUSWC6FitCtkrN_DBnoXqK7PyAIgEMlUhmLdcrvB_Gry5VKhBYNxOK5qmStgxCCxD5aG4SQ"
+  },
+  "genesis_bond": {
+    "uuid": "erwevxoh6odw7dbpf3wu2sb5by",
+    "id": "GB-2025-0524-DRH-LCS-001",
+    "frequency": 741,
+    "coherence": 1.0,
+    "tier": "PAC",
+    "timestamp": "2026-06-26T19:19:11.711503Z"
+  },
+  "expirationDate": "2027-06-26T19:19:11.710569Z"
+}

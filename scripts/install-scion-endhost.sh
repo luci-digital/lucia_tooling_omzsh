@@ -35,7 +35,7 @@ log "Detected platform: $PLATFORM"
 # Configuration
 SCION_VERSION="${SCION_VERSION:-v0.11.0}"
 SCION_ISD_AS="${SCION_ISD_AS:-5-528:0:1}"  # ISD-5, AS-528, instance 1
-SCION_LOCAL_IP="${SCION_LOCAL_IP:-192.168.1.125}"  # ZBook default
+SCION_LOCAL_IP="${SCION_LOCAL_IP:-192.168.1.145}"  # ZBook default
 INSTALL_DIR="${SCION_INSTALL_DIR:-$HOME/.scion}"
 
 log "SCION Version: $SCION_VERSION"

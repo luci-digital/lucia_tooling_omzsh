@@ -1,0 +1,11 @@
+{
+  "//": "Merge into ~/.config/zed/settings.json. Build first: cargo build --release --bin luci-mcp --features mcp",
+  "context_servers": {
+    "luci-mcp": {
+      "source": "custom",
+      "command": "/absolute/path/to/ohmyzsh/core/vcs/target/release/luci-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

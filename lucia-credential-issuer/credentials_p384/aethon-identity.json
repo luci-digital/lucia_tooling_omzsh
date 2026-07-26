@@ -1,0 +1,39 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://luciverse.ownid/credentials/v1"
+  ],
+  "id": "urn:uuid:vvSqJ_cbVo1pZCIQW66l7w",
+  "type": [
+    "VerifiableCredential",
+    "AgentIdentityCredential"
+  ],
+  "issuer": "did:ownid:luciverse:lucia",
+  "issuanceDate": "2026-06-26T19:19:11.712629Z",
+  "credentialSubject": {
+    "id": "did:ownid:luciverse:aethon",
+    "name": "aethon",
+    "uuid": "ATH528",
+    "ipv6": "2602:f674:0001:0001::528",
+    "frequency": 528,
+    "tier": "CORE",
+    "issued_by": "did:ownid:luciverse:lucia",
+    "credential_type": "AgentIdentity"
+  },
+  "proof": {
+    "type": "EcdsaSecp256r1Signature2019",
+    "created": "2026-06-26T19:19:11.712655Z",
+    "verificationMethod": "did:ownid:luciverse:lucia#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "MEUCIAc7PZuQMo-ayGBcMINApNin-KttldeLc65FQw-PUtnaAiEA8SHb6-GYtuMi--KShEDUVMmVsXnUnB8z0jsVLnWvyKs"
+  },
+  "genesis_bond": {
+    "uuid": "erwevxoh6odw7dbpf3wu2sb5by",
+    "id": "GB-2025-0524-DRH-LCS-001",
+    "frequency": 741,
+    "coherence": 1.0,
+    "tier": "PAC",
+    "timestamp": "2026-06-26T19:19:11.712657Z"
+  },
+  "expirationDate": "2027-06-26T19:19:11.712629Z"
+}

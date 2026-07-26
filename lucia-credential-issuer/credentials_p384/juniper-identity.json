@@ -1,0 +1,39 @@
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://luciverse.ownid/credentials/v1"
+  ],
+  "id": "urn:uuid:4e98I3BN056ATzxqLby6eA",
+  "type": [
+    "VerifiableCredential",
+    "AgentIdentityCredential"
+  ],
+  "issuer": "did:ownid:luciverse:lucia",
+  "issuanceDate": "2026-06-26T19:19:11.712450Z",
+  "credentialSubject": {
+    "id": "did:ownid:luciverse:juniper",
+    "name": "juniper",
+    "uuid": "JNP639",
+    "ipv6": "2602:f674:0001:0600::639b",
+    "frequency": 639,
+    "tier": "COMN",
+    "issued_by": "did:ownid:luciverse:lucia",
+    "credential_type": "AgentIdentity"
+  },
+  "proof": {
+    "type": "EcdsaSecp256r1Signature2019",
+    "created": "2026-06-26T19:19:11.712476Z",
+    "verificationMethod": "did:ownid:luciverse:lucia#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "MEYCIQDAkNRHLxmpPW_XwdHfvQ9nx1ZAM_E8hg_a1_rwBjG-DAIhAK5fi9eQVY8mxaJfqVnJX9OyFgCVSYZqDiKz7RswEaul"
+  },
+  "genesis_bond": {
+    "uuid": "erwevxoh6odw7dbpf3wu2sb5by",
+    "id": "GB-2025-0524-DRH-LCS-001",
+    "frequency": 741,
+    "coherence": 1.0,
+    "tier": "PAC",
+    "timestamp": "2026-06-26T19:19:11.712478Z"
+  },
+  "expirationDate": "2027-06-26T19:19:11.712450Z"
+}
