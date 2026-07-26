@@ -1,0 +1,3 @@
+[submodule "Zed-EmmyLua"]
+	path = Zed-EmmyLua
+	url = https://github.com/EmmyLua/EmmyLua-LanguageServer.git
