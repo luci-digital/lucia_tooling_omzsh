@@ -43,7 +43,7 @@ is the agent that holds truth without coercion — so the VCS substrate runs at
 ## File Layout
 
 ```
-core/vcs/
+modules/scm/luci-vcs/
 ├── Cargo.toml          # workspace manifest — gix, prodash, tokio, jj-lib, rmcp
 ├── src/
 │   ├── lib.rs          # public API — Repository, BlockCache, Bridge

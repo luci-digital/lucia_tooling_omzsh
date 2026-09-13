@@ -45,7 +45,9 @@ The SCM stack integrates with the LuciVerse MCP ecosystem:
 - **Gen 3 SDK servers** in `src/mcp/` provide filesystem, ecosystem, and metaverse tools via `@modelcontextprotocol/sdk`
 - **Gen 4 Rust server** (`agents/mcp-servers/lucia-mcp-memory/`) provides Soul Memory ingestion
 - **Unified gateway** (`agents/mcp-servers/lucia-mcp-unified-server/`) proxies to all registered backends
-- **`luci-metabase-mcp`** provides Metabase analytics access (most mature, TypeScript)
+- **`aifam-mcp`** (Iris, `aifam-mcp/`) is this repo's TypeScript MCP gateway to exo/MLX inference and Matter devices
+- **`luci-mcp`** (`modules/scm/luci-vcs/src/bin/mcp.rs`) is this repo's Rust MCP server for DID handles and VCS substrate metadata
+- **`luci-metabase-mcp`** (separate repo) is the TypeScript reference implementation of the internal MCP server pattern (`luciverse-system-config/documentation/MCP_SERVER_PATTERN.md`): stdio-only, launched by its client, not a deployed endpoint
 
 > **Rule**: MCP server sync (step 5 in `lds_parsing_workflow`) targets the Gen 3 SDK servers — NOT the legacy hand-rolled JSON-RPC implementations.
 

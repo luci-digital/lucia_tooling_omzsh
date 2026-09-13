@@ -56,7 +56,7 @@ file → CDC chunks (~1 MiB average) → BLAKE3 hash each chunk → store in IPF
 - Compression: zstd level 3 at rest
 - Deduplication scope: global across all sovereign nodes sharing the IPFS swarm
 
-**Ref:** `core/vcs/src/block_cache.rs` · `xet-data` crate · [xet-core](https://github.com/huggingface/xet-core)
+**Ref:** `modules/scm/luci-vcs/src/block_cache.rs` · `xet-data` crate · [xet-core](https://github.com/huggingface/xet-core)
 
 ### 1.3 IPv6 Allocation (Storage)
 
@@ -456,11 +456,11 @@ judge_luci_threshold = 0.7
 
 | Component | Location | Language | LDS |
 |---|---|---|---|
-| IPVM workflow types | `core/vcs/src/workflow.rs` | Rust | 700.700 |
-| Block cache (CAS) | `core/vcs/src/block_cache.rs` | Rust | 700.529 |
+| IPVM workflow types | `modules/scm/luci-vcs/src/workflow.rs` | Rust | 700.700 |
+| Block cache (CAS) | `modules/scm/luci-vcs/src/block_cache.rs` | Rust | 700.529 |
 | Homestar service | `orchestration/lds_lineage/scm/podman-compose.yml` | Podman | 800.741 |
 | IPFS Kubo service | `orchestration/lds_lineage/scm/podman-compose.yml` | Podman | 700.529 |
-| gitweb HTTP | `core/vcs/src/web.rs` | Rust/hyper | 700.080 |
+| gitweb HTTP | `modules/scm/luci-vcs/src/web.rs` | Rust/hyper | 700.080 |
 | Sentropy analysis | `src/functions/sentropy.ts` | TypeScript | 580.0 |
 | LuciClock | `src/lib/luci-clock.ts` | TypeScript | temporal |
 

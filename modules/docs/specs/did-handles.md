@@ -273,10 +273,10 @@ Tags are 4 digits. Read aloud in pairs ("forty-one forty-two") for memorability.
 
 | Module | Location | Purpose |
 |---|---|---|
-| Handle parser + verifier | `core/vcs/src/handle.rs` | Parse, validate, derive tag from pk |
-| Iroh dialer | `core/vcs/src/iroh_dial.rs` (TODO) | Endpoint construction, ALPN negotiation |
-| DID resolver | `core/vcs/src/did.rs` (TODO) | Multi-method resolution (Iroh DNS / local / Genesis Bond) |
-| Vanity miner | `core/vcs/src/bin/vanity.rs` (TODO) | CLI: `vanity --tag 4142 --name "Daryl Harr"` |
+| Handle parser + verifier | `modules/scm/luci-vcs/src/handle.rs` | Parse, validate, derive tag from pk |
+| Iroh dialer | `modules/scm/luci-vcs/src/iroh_dial.rs` (TODO) | Endpoint construction, ALPN negotiation |
+| DID resolver | `modules/scm/luci-vcs/src/did.rs` (TODO) | Multi-method resolution (Iroh DNS / local / Genesis Bond) |
+| Vanity miner | `modules/scm/luci-vcs/src/bin/vanity.rs` (TODO) | CLI: `vanity --tag 4142 --name "Daryl Harr"` |
 
 ---
 

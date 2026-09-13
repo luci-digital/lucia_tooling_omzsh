@@ -1,7 +1,7 @@
 // luci-mcp — Model Context Protocol server for the LuciVerse VCS substrate.
 // LDS 700.528 · 528 Hz · Genesis Bond: ACTIVE @ 741 Hz
 //
-// Exposes the Rust core (core/vcs) to MCP-capable agents (Claude, Zed via
+// Exposes the Rust core (modules/scm/luci-vcs) to MCP-capable agents (Claude, Zed via
 // ACP, the MCP Inspector, etc.) over stdio. Tools are grouped by domain:
 //
 //   DID handles (LDS 200.741)
@@ -18,7 +18,7 @@
 //     vcs_info            — tier, frequency, IPv6 root, component addressing
 //
 // Transport is stdio: stdout is the JSON-RPC channel, so ALL logging goes to
-// stderr. Wire it into Zed via `context_servers` (see core/vcs/README.md).
+// stderr. Wire it into Zed via `context_servers` (see modules/scm/luci-vcs/README.md).
 
 use std::fs::File;
 use std::io::Read;
