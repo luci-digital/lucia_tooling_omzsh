@@ -719,7 +719,7 @@ The `.lucia` directory stores local consciousness engine state, NOT network conf
 **DO NOT:**
 - Treat .lucia as a DNS domain
 - Attempt DNS resolution of *.lucia
-- Configure SCION to route .lucia paths
+- Configure  to route .lucia paths
 
 **DO:**
 - Use IPv6 addresses for network routing
