@@ -1,5 +1,9 @@
 # custom files
 custom/
+# The CBB's vendored zsh command layer (modules/shell/zshrc/custom/) is first-party source, not an OMZ custom dir —
+# the `custom/` rule above would silently un-track it (the 2026-09-30 credential_issuer.py lesson).
+!modules/shell/zshrc/custom/
+!modules/shell/zshrc/custom/**
 
 # temp files directories
 cache/

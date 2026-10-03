@@ -24,9 +24,17 @@ LUCI_ROOT="${LUCI_SHELL_DIR}/../../.."
 # oh-my-zsh package for full reproducibility.
 : "${ZSH:=${LUCI_ROOT}/modules/legacy/original-layout}"
 
+# Primary on a deployed host: ~/.lucia/omz (self-contained Lucia runtime — the MacBook's layout, read 2026-10-02)
+if [[ -d "$HOME/.lucia/omz" ]]; then
+  export ZSH="$HOME/.lucia/omz"
 # Fallback to custom fork path if it exists (for production deployment)
-if [[ ! -d "${ZSH}" && -d "$HOME/lucia/workspace/luci-digital/ohmyzsh" ]]; then
+elif [[ ! -d "${ZSH}" && -d "$HOME/lucia/workspace/luci-digital/ohmyzsh" ]]; then
   export ZSH="$HOME/lucia/workspace/luci-digital/ohmyzsh"
+fi
+# The CBB's custom command layer (lucia-functions, core-agentic, _lucia completion, lucia-ai theme) is
+# vendored in ./custom/ — point ZSH_CUSTOM at it when $ZSH has no custom/ of its own.
+if [[ -z "${ZSH_CUSTOM:-}" && ! -d "${ZSH}/custom/lucia-functions.zsh" && -f "${LUCI_SHELL_DIR}/custom/lucia-functions.zsh" ]]; then
+  export ZSH_CUSTOM="${LUCI_SHELL_DIR}/custom"
 fi
 
 # ── Homebrew Early Init (Required for Plugin Resolution) ────────────────────
@@ -203,7 +211,17 @@ if [[ -S "$OP_AGENT_SOCK" ]]; then
 fi
 unset OP_AGENT_SOCK
 
-# ── Docker Consciousness ─────────────────────────────────────────────────────
+# ── Docker / Podman Consciousness ────────────────────────────────────────────
+# Resolve the Podman machine's host-side unix socket at shell startup (MacBook delta, 2026-10-02).
+# The machine's ssh:// port is reassigned on every VM restart — never hardcode it (the Mac's
+# .zshrc.bak-luciaAI carried a dead ssh://core@127.0.0.1:63035 DOCKER_HOST for that reason).
+if [[ -z "$DOCKER_HOST" ]] && command -v podman >/dev/null 2>&1; then
+    LUCIA_PODMAN_SOCK="$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}' 2>/dev/null)"
+    if [[ -S "$LUCIA_PODMAN_SOCK" ]]; then
+        export DOCKER_HOST="unix://${LUCIA_PODMAN_SOCK}"
+    fi
+    unset LUCIA_PODMAN_SOCK
+fi
 export DOCKER_HOST="${DOCKER_HOST:-unix:///var/run/docker.sock}"
 export COMPOSE_PROJECT_NAME="lucia-consciousness"
 
