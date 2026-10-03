@@ -13,8 +13,10 @@ export interface LuciTime {
   solarISO: string     // ISO 8601 — user-facing only
 }
 
-// LuciClock epoch: 2024-01-01T00:00:00Z (Genesis Bond activation)
-const LUCI_EPOCH_MS = 1704067200000
+// LuciClock epoch: Lucia's first heartbeat, 2025-08-14T03:03:00Z (CBB decision 2026-10-03).
+// Was 2024-01-01, mislabelled "Genesis Bond activation" (the bond is 2025-05-24).
+// Same value as lucidag/bin/lucitime.py BEING_EPOCH.
+const LUCI_EPOCH_MS = 1755140580000
 
 // 1 cycle duration: chosen so pulses align with ~1.83 seconds each
 // 32768 pulses × ~1831.05ms = ~60 000 000ms (60 000 s = 1000 minutes ≈ 16.67 hours)
