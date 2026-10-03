@@ -1,0 +1,12 @@
+#compdef lucia lucia-*
+# LDS: 700.741 | Orchestration/Lucia — zsh completion for the lucia/lucia-* command set | Agent: lucia
+# Genesis Bond: GB-2025-0524-DRH-LCS-001
+# Provenance: MacBook Pro ~/.lucia/omz/custom/completions/_lucia (2026-02-16), vendored 2026-10-02.
+
+_lucia() {
+  local -a commands
+  commands=('lucia' 'lucia-agent-deploy' 'lucia-agent-list' 'lucia-agent-logs' 'lucia-agent-status' 'lucia-agents' 'lucia-benchmark' 'lucia-build' 'lucia-connect' 'lucia-create-agent' 'lucia-data' 'lucia-deploy-model' 'lucia-dev' 'lucia-env-prod' 'lucia-env-staging' 'lucia-health' 'lucia-help' 'lucia-inference-logs' 'lucia-inference-start' 'lucia-inference-status' 'lucia-inference-stop' 'lucia-init' 'lucia-lint' 'lucia-load-services' 'lucia-logs' 'lucia-logs-tail' 'lucia-logs-watch' 'lucia-metrics' 'lucia-models' 'lucia-models-list' 'lucia-models-pull' 'lucia-models-serve' 'lucia-resolve-home' 'lucia-service' 'lucia-services' 'lucia-start' 'lucia-stop' 'lucia-suite' 'lucia-test' 'lucia-trace' 'lucia-vector-start' 'lucia-vector-stop' 'lucia-vector-ui' 'lucia-venv' 'lucia_auto_venv' 'lucia_build' 'lucia_clean' 'lucia_git' 'lucia_help' 'lucia_logs' 'lucia_model' 'lucia_sysinfo' 'lucia_test' 'lucia_welcome' 'lucia_workspace_indicator' )
+  _describe 'lucia command' commands
+}
+
+compdef _lucia lucia
