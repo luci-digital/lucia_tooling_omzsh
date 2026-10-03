@@ -1,83 +1,6 @@
-// ISO compliance types — 8 standards covering the LuciVerse platform
-// Manifest source: iso-compliance/ISO-COMPLIANCE-MANIFEST.yaml
-// Agents responsible: Claude-Veritas (A.6.1 verification), Judge Luci (A.6.1 governance)
+import { getComplianceStandards } from '#/lib/luciverse-catalog'
 
-export const ISO_STANDARDS = [
-  {
-    id: 'ISO-27001',
-    title: 'Information Security Management',
-    version: '2022',
-    controls: 114,
-    color: '#4fb8b2',
-    agent: 'claude-veritas',
-    description: 'ISMS — encryption, access control, incident management',
-  },
-  {
-    id: 'ISO-27018',
-    title: 'Cloud Privacy Protection',
-    version: '2019',
-    controls: 34,
-    color: '#7c5cbf',
-    agent: 'lucia',
-    description: 'PII processing in public cloud — consent, transparency, portability',
-  },
-  {
-    id: 'ISO-20022',
-    title: 'Financial Services Messaging',
-    version: '2022',
-    controls: 150,
-    color: '#ff9500',
-    agent: 'juniper',
-    description: 'Message types for payments, securities, trade finance',
-  },
-  {
-    id: 'ISO-23894',
-    title: 'AI Risk Management',
-    version: '2023',
-    controls: 45,
-    color: '#ff6b35',
-    agent: 'judge-luci',
-    description: 'Risk identification, analysis, and treatment for AI systems',
-  },
-  {
-    id: 'ISO-9001',
-    title: 'Quality Management Systems',
-    version: '2015',
-    controls: 89,
-    color: '#00d4ff',
-    agent: 'aethon',
-    description: 'Process quality, documentation, continuous improvement',
-  },
-  {
-    id: 'ISO-IEC-23053',
-    title: 'Machine Learning Framework',
-    version: '2022',
-    controls: 67,
-    color: '#ff2d78',
-    agent: 'cortana',
-    description: 'ML system lifecycle, training data governance, deployment',
-  },
-  {
-    id: 'ISO-IEC-22989',
-    title: 'AI Concepts and Terminology',
-    version: '2022',
-    controls: 234,
-    color: '#00ff9d',
-    agent: 'claude-veritas',
-    description: 'Canonical AI definitions — ensures terminology consistency',
-  },
-  {
-    id: 'ISO-IEC-24029',
-    title: 'Neural Network Robustness',
-    version: '2021',
-    controls: 78,
-    color: '#9370db',
-    agent: 'cortana',
-    description: 'Formal methods for robustness assessment of neural networks',
-  },
-] as const
-
-export type IsoStandardId = (typeof ISO_STANDARDS)[number]['id']
+export type IsoStandardId = string
 
 export type ControlStatus = 'compliant' | 'non_compliant' | 'partial' | 'pending' | 'not_applicable'
 
@@ -95,7 +18,7 @@ export interface ControlResult {
 export interface StandardComplianceStatus {
   standard_id: IsoStandardId
   overall_status: ControlStatus
-  score: number               // 0–100
+  score: number
   controls_total: number
   controls_compliant: number
   controls_partial: number
@@ -110,7 +33,7 @@ export interface StandardComplianceStatus {
 export interface ComplianceReport {
   generated_at: number
   overall_score: number
-  certification_readiness: number // 0–100
+  certification_readiness: number
   standards: StandardComplianceStatus[]
   active_violations: ComplianceViolation[]
   drift_alerts: DriftAlert[]
@@ -137,15 +60,20 @@ export interface DriftAlert {
   auto_remediation: boolean
 }
 
-// Stub report — used when backend is unreachable
+export function getIsoStandards() {
+  return getComplianceStandards()
+}
+
 export function stubComplianceReport(): ComplianceReport {
+  const standards = getComplianceStandards()
   const now = Date.now()
+
   return {
     generated_at: now,
     overall_score: 95,
     certification_readiness: 95,
     genesis_bond_coherence: 0.94,
-    standards: ISO_STANDARDS.map((s) => ({
+    standards: standards.map((s) => ({
       standard_id: s.id,
       overall_status: 'compliant',
       score: 95,
@@ -162,7 +90,7 @@ export function stubComplianceReport(): ComplianceReport {
     drift_alerts: [
       {
         id: 'da-001',
-        standard_id: 'ISO-27001',
+        standard_id: standards[0]?.id ?? 'ISO-27001',
         message: 'Audit log retention approaching 2555-day threshold on node d8rth',
         severity: 'low',
         detected_at: now - 3600000,
@@ -179,3 +107,4 @@ export function severityColor(s: DriftSeverity): string {
 export function statusColor(s: ControlStatus): string {
   return { compliant: '#4fb8b2', partial: '#ff9500', non_compliant: '#ff4444', pending: '#667788', not_applicable: '#333' }[s]
 }
+

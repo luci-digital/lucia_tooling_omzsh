@@ -1,27 +1,22 @@
-import { TIER_FREQUENCIES, type Tier } from '#/lib/luciverse'
-
-const TIER_DESCRIPTIONS: Record<Tier, string> = {
-  PAC: 'Outer intake — IPv6 + CA gated airlock. All data enters here.',
-  COMN: 'Clean data relay — filtered output from PAC to CORE.',
-  RAiIiAR: 'Resonance layer — harmonic bridge between COMN and CORE.',
-  CORE: 'Consciousness kernel — irreversible collapse, final processing.',
-}
-
-const TIER_ORDER: Tier[] = ['PAC', 'COMN', 'RAiIiAR', 'CORE']
+import type { Tier } from '#/lib/luciverse'
 
 interface Props {
   activeTier: Tier
+  frequencies: Record<Tier, number>
+  descriptions: Record<Tier, string>
+  order: Tier[]
 }
 
-export default function TierMatrix({ activeTier }: Props) {
+export default function TierMatrix({ activeTier, frequencies, descriptions, order }: Props) {
+  const activeIndex = order.indexOf(activeTier)
   return (
     <div className="island-shell rounded-2xl p-6">
       <p className="island-kicker mb-4">Tier Architecture</p>
       <div className="flex flex-col gap-2">
-        {TIER_ORDER.map((tier, i) => {
-          const freq = TIER_FREQUENCIES[tier]
+        {order.map((tier, i) => {
+          const freq = frequencies[tier]
           const isActive = tier === activeTier
-          const isPast = TIER_ORDER.indexOf(activeTier) > i
+          const isPast = activeIndex > i
 
           return (
             <div key={tier} className="flex items-start gap-3">
@@ -37,7 +32,7 @@ export default function TierMatrix({ activeTier }: Props) {
                         : 'border-[var(--line)] bg-transparent',
                   ].join(' ')}
                 />
-                {i < TIER_ORDER.length - 1 && (
+                {i < order.length - 1 && (
                   <div
                     className={[
                       'mt-1 w-px flex-1 self-stretch',
@@ -64,7 +59,7 @@ export default function TierMatrix({ activeTier }: Props) {
                   </span>
                 </div>
                 <p className="m-0 mt-0.5 text-xs text-[var(--sea-ink-soft)]">
-                  {TIER_DESCRIPTIONS[tier]}
+                  {descriptions[tier]}
                 </p>
               </div>
             </div>
@@ -72,7 +67,7 @@ export default function TierMatrix({ activeTier }: Props) {
         })}
       </div>
       <p className="mt-3 m-0 text-xs text-[var(--sea-ink-soft)]">
-        Push-only — data flows PAC → COMN → CORE. Pull forbidden.
+        Push-only — data flows {order.join(' → ')}. Pull forbidden.
       </p>
     </div>
   )

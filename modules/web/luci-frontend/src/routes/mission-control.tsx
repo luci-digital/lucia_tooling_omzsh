@@ -3,25 +3,16 @@ import { useState } from 'react'
 import { getSubstrateStatus, listAgents } from '#/functions/luciverse'
 import type { SubstrateStatus, AgentProfile } from '#/lib/luciverse'
 import SignalFeed from '#/components/SignalFeed'
+import { primeLuciverseCatalog } from '#/lib/luciverse'
 
 export const Route = createFileRoute('/mission-control')({
   loader: async () => {
+    await primeLuciverseCatalog()
     const [status, agents] = await Promise.all([getSubstrateStatus(), listAgents()])
     return { status, agents }
   },
   component: MissionControlPage,
 })
-
-const AGENT_COLORS: Record<string, string> = {
-  lucia:          '#9370db',
-  'judge-luci':   '#00d4ff',
-  juniper:        '#00ff9d',
-  cortana:        '#ff6b35',
-  'claude-veritas': '#4fb8b2',
-  aethon:         '#ff9500',
-  pinky:          '#ff2d78',
-  default:        '#667788',
-}
 
 function freqColor(freq: number) {
   if (freq >= 900) return '#00d4ff'
@@ -138,7 +129,7 @@ function AgentMesh({ agents }: { agents: AgentProfile[] }) {
       </h2>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {agents.map((agent) => {
-          const color = AGENT_COLORS[agent.id] ?? AGENT_COLORS.default
+          const color = agent.color ?? '#667788'
           const fColor = agent.frequency ? freqColor(agent.frequency) : '#667788'
           return (
             <div

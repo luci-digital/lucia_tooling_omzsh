@@ -1,29 +1,48 @@
-// Luciverse constants and shared types — mirrors lua-substrate definitions
+import {
+  getAgentRegistry,
+  getCatalogEndpoints,
+  getLuciverseCatalog,
+  getSignalTypes,
+  getTierDescriptions,
+  getTierFrequencies,
+  getTierFrequency,
+  getTierOrder,
+  primeLuciverseCatalog,
+} from '#/lib/luciverse-catalog'
 
-export const TIER_FREQUENCIES = {
-  CORE: 432,
-  COMN: 528,
-  RAiIiAR: 639,
-  PAC: 741,
-} as const
+export type Tier = 'CORE' | 'COMN' | 'RAiIiAR' | 'PAC'
 
-export type Tier = keyof typeof TIER_FREQUENCIES
+export const TIER_FREQUENCIES: Record<Tier, number> = new Proxy({} as Record<Tier, number>, {
+  get(_target, prop) {
+    if (typeof prop !== 'string') return undefined
+    return getTierFrequencies()[prop as Tier]
+  },
+}) as Record<Tier, number>
 
-export const TIER_COLORS: Record<Tier, string> = {
-  CORE: 'var(--sea-ink)',
-  COMN: 'var(--palm)',
-  RAiIiAR: '#7c5cbf',
-  PAC: 'var(--lagoon-deep)',
-}
+export const TIER_COLORS: Record<Tier, string> = new Proxy({} as Record<Tier, string>, {
+  get(_target, prop) {
+    if (typeof prop !== 'string') return undefined
+    return getLuciverseCatalog().tiers.colors[prop as Tier]
+  },
+}) as Record<Tier, string>
 
-// 16 signals from signal/bus.lua
-export const SIGNALS = [
-  'announce', 'ready', 'ack', 'nak', 'complete', 'cancel',
-  'discover', 'capability', 'heartbeat', 'offline', 'pause',
-  'resume', 'stream_start', 'stream_end', 'memory_sync', 'pulse_align',
-] as const
-
-export type SignalType = (typeof SIGNALS)[number]
+export type SignalType =
+  | 'announce'
+  | 'ready'
+  | 'ack'
+  | 'nak'
+  | 'complete'
+  | 'cancel'
+  | 'discover'
+  | 'capability'
+  | 'heartbeat'
+  | 'offline'
+  | 'pause'
+  | 'resume'
+  | 'stream_start'
+  | 'stream_end'
+  | 'memory_sync'
+  | 'pulse_align'
 
 export interface SubstrateStatus {
   version: string
@@ -42,16 +61,7 @@ export interface AgentProfile {
   service: string
   frequency?: number
   system_message?: string
-}
-
-export interface SignalMessage {
-  signal: SignalType
-  source_did: string
-  target_did: string
-  channel_id: string
-  timestamp: number
-  ttl_seconds: number
-  payload?: Record<string, string>
+  color?: string
 }
 
 export interface ChatMessage {
@@ -65,30 +75,45 @@ export interface ChatResponse {
   model?: string
 }
 
-// Luciverse tier endpoint from env
 export function tierEndpoint(tier: Tier): string {
+  const endpoints = getCatalogEndpoints()
   const map: Record<Tier, string> = {
-    PAC: process.env['LUCIVERSE_PAC_URL'] ?? 'http://localhost:8741',
-    COMN: process.env['LUCIVERSE_COMN_URL'] ?? 'http://localhost:8742',
-    CORE: process.env['LUCIVERSE_CORE_URL'] ?? 'http://localhost:8743',
-    RAiIiAR: process.env['LUCIVERSE_COMN_URL'] ?? 'http://localhost:8742',
+    PAC: endpoints.pac,
+    COMN: endpoints.comn,
+    CORE: endpoints.core,
+    RAiIiAR: endpoints.comn,
   }
   return map[tier]
 }
 
 export function oasisEndpoint(): string {
-  return process.env['OASIS_ENDPOINT'] ?? 'http://localhost:8742'
+  return getCatalogEndpoints().oasis
 }
 
 export function thisTier(): Tier {
+  const catalog = getLuciverseCatalog()
   const t = process.env['LUCIVERSE_TIER'] as Tier
-  return t in TIER_FREQUENCIES ? t : 'PAC'
+  return t in catalog.tiers.frequencies ? t : catalog.tiers.order[0]
 }
 
 export function thisFrequency(): number {
-  return Number(process.env['LUCIVERSE_FREQUENCY'] ?? TIER_FREQUENCIES[thisTier()])
+  return Number(process.env['LUCIVERSE_FREQUENCY'] ?? getTierFrequency(thisTier()))
 }
 
 export function thisCoherence(): number {
   return Number(process.env['LUCIVERSE_COHERENCE'] ?? 0.85)
 }
+
+export function getTierMap(): Record<Tier, number> {
+  return getTierFrequencies()
+}
+
+export function getTierSequence(): Tier[] {
+  return getTierOrder()
+}
+
+export function getTierNotes(): Record<Tier, string> {
+  return getTierDescriptions()
+}
+
+export { getAgentRegistry, getSignalTypes, primeLuciverseCatalog, getLuciverseCatalog }

@@ -4,14 +4,19 @@ import GenesisBondCard from '#/components/GenesisBondCard'
 import TierMatrix from '#/components/TierMatrix'
 import ModuleGrid from '#/components/ModuleGrid'
 import SignalFeed from '#/components/SignalFeed'
+import { primeLuciverseCatalog, getLuciverseCatalog } from '#/lib/luciverse'
 
 export const Route = createFileRoute('/')({
-  loader: () => getSubstrateStatus(),
+  loader: async () => {
+    await primeLuciverseCatalog()
+    const status = await getSubstrateStatus()
+    return { status, catalog: getLuciverseCatalog() }
+  },
   component: Dashboard,
 })
 
 function Dashboard() {
-  const status = Route.useLoaderData()
+  const { status, catalog } = Route.useLoaderData()
 
   return (
     <main className="page-wrap px-4 pb-12 pt-8">
@@ -28,14 +33,19 @@ function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Genesis Bond + module grid span 2 cols */}
         <div className="flex flex-col gap-4 lg:col-span-2">
-          <GenesisBondCard status={status} />
+          <GenesisBondCard status={status} frequencies={catalog.tiers.frequencies} />
           <ModuleGrid modules={status.modules} />
           <SignalFeed />
         </div>
 
         {/* Tier matrix sidebar */}
         <div>
-          <TierMatrix activeTier={status.tier} />
+          <TierMatrix
+            activeTier={status.tier}
+            frequencies={catalog.tiers.frequencies}
+            descriptions={catalog.tiers.descriptions}
+            order={catalog.tiers.order}
+          />
         </div>
       </div>
     </main>

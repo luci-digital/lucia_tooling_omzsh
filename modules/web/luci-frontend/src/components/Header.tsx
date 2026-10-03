@@ -71,6 +71,20 @@ export default function Header() {
             Mission Control
           </Link>
           <Link
+            to="/workbench"
+            className="nav-link"
+            activeProps={{ className: 'nav-link is-active' }}
+          >
+            Workbench
+          </Link>
+          <Link
+            to="/foundations"
+            className="nav-link"
+            activeProps={{ className: 'nav-link is-active' }}
+          >
+            Foundations
+          </Link>
+          <Link
             to="/non-terms"
             className="nav-link"
             activeProps={{ className: 'nav-link is-active' }}

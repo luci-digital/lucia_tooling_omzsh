@@ -1,14 +1,15 @@
 import type { SubstrateStatus } from '#/lib/luciverse'
-import { TIER_FREQUENCIES } from '#/lib/luciverse'
+import type { Tier } from '#/lib/luciverse'
 
 interface Props {
   status: SubstrateStatus
+  frequencies: Record<Tier, number>
 }
 
-export default function GenesisBondCard({ status }: Props) {
+export default function GenesisBondCard({ status, frequencies }: Props) {
   const active = status.genesis_bond === 'ACTIVE'
   const coherencePct = Math.round(status.coherence * 100)
-  const tierFreq = TIER_FREQUENCIES[status.tier] ?? status.frequency
+  const tierFreq = frequencies[status.tier] ?? status.frequency
 
   return (
     <div className="island-shell rounded-2xl p-6">
