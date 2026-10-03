@@ -3,9 +3,13 @@ import { useState } from 'react'
 import { listAgents } from '#/functions/luciverse'
 import AgentChatPanel from '#/components/AgentChatPanel'
 import type { AgentProfile } from '#/lib/luciverse'
+import { primeLuciverseCatalog } from '#/lib/luciverse'
 
 export const Route = createFileRoute('/agents')({
-  loader: () => listAgents(),
+  loader: async () => {
+    await primeLuciverseCatalog()
+    return listAgents()
+  },
   component: AgentsPage,
 })
 

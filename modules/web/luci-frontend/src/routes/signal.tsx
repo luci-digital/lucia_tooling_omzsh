@@ -1,15 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getSignalBusStatus } from '#/functions/luciverse'
 import SignalFeed from '#/components/SignalFeed'
-import { SIGNALS } from '#/lib/luciverse'
+import { primeLuciverseCatalog, getLuciverseCatalog } from '#/lib/luciverse'
 
 export const Route = createFileRoute('/signal')({
-  loader: () => getSignalBusStatus(),
+  loader: async () => {
+    await primeLuciverseCatalog()
+    const busStatus = await getSignalBusStatus()
+    return { busStatus, catalog: getLuciverseCatalog() }
+  },
   component: SignalPage,
 })
 
 function SignalPage() {
-  const busStatus = Route.useLoaderData()
+  const { busStatus, catalog } = Route.useLoaderData()
 
   return (
     <main className="page-wrap px-4 pb-12 pt-8">
@@ -44,7 +48,7 @@ function SignalPage() {
           <div className="island-shell rounded-2xl p-5">
             <p className="island-kicker mb-3">Signal Types</p>
             <div className="flex flex-wrap gap-1.5">
-              {SIGNALS.map((s) => (
+              {catalog.signals.map((s) => (
                 <span
                   key={s}
                   className="rounded-lg border border-[var(--line)] px-2 py-1 text-xs font-mono text-[var(--sea-ink-soft)]"
