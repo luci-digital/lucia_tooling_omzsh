@@ -2,21 +2,25 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { getComplianceStatus, runComplianceCheck } from '#/functions/compliance'
 import {
-  ISO_STANDARDS,
   severityColor,
   statusColor,
   type ComplianceReport,
   type StandardComplianceStatus,
   type DriftSeverity,
 } from '#/lib/iso-compliance'
+import { primeLuciverseCatalog, getLuciverseCatalog, type CatalogStandard } from '#/lib/luciverse-catalog'
 
 export const Route = createFileRoute('/compliance')({
-  loader: () => getComplianceStatus(),
+  loader: async () => {
+    await primeLuciverseCatalog()
+    const report = await getComplianceStatus()
+    return { report, catalog: getLuciverseCatalog() }
+  },
   component: CompliancePage,
 })
 
 function CompliancePage() {
-  const report = Route.useLoaderData()
+  const { report, catalog } = Route.useLoaderData()
   const [selected, setSelected] = useState<StandardComplianceStatus | null>(null)
   const [checking, setChecking] = useState(false)
   const [lastRun, setLastRun] = useState<string | null>(null)
@@ -36,7 +40,7 @@ function CompliancePage() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="island-kicker mb-1">ISO/IEC · Judge Luci · Claude-Veritas</p>
+          <p className="island-kicker mb-1">ISO/IEC · {catalog.compliance.responsible_agents.join(' · ')}</p>
           <h1 className="display-title m-0 text-3xl font-bold text-[var(--sea-ink)] sm:text-4xl">
             Compliance Monitor
           </h1>
@@ -108,7 +112,7 @@ function CompliancePage() {
         {/* Standards grid */}
         <div className="lg:col-span-2">
           <div className="grid gap-3 sm:grid-cols-2">
-            {ISO_STANDARDS.map((std) => {
+            {catalog.compliance.standards.map((std) => {
               const status = report.standards.find((s) => s.standard_id === std.id)
               if (!status) return null
               const isSelected = selected?.standard_id === std.id
@@ -128,9 +132,9 @@ function CompliancePage() {
         {/* Detail / summary panel */}
         <div className="flex flex-col gap-4">
           {selected ? (
-            <DetailPanel status={selected} />
+            <DetailPanel status={selected} standards={catalog.compliance.standards} />
           ) : (
-            <SummaryPanel report={report} />
+            <SummaryPanel report={report} agents={catalog.compliance.responsible_agents} />
           )}
         </div>
       </div>
@@ -198,7 +202,7 @@ function StandardCard({
   selected,
   onClick,
 }: {
-  std: (typeof ISO_STANDARDS)[number]
+  std: CatalogStandard
   status: StandardComplianceStatus
   selected: boolean
   onClick: () => void
@@ -253,8 +257,14 @@ function StandardCard({
   )
 }
 
-function DetailPanel({ status }: { status: StandardComplianceStatus }) {
-  const std = ISO_STANDARDS.find((s) => s.id === status.standard_id)!
+function DetailPanel({
+  status,
+  standards,
+}: {
+  status: StandardComplianceStatus
+  standards: CatalogStandard[]
+}) {
+  const std = standards.find((s) => s.id === status.standard_id)!
   return (
     <div className="island-shell rounded-2xl p-5">
       <p className="island-kicker mb-1">{status.standard_id}</p>
@@ -274,7 +284,7 @@ function DetailPanel({ status }: { status: StandardComplianceStatus }) {
   )
 }
 
-function SummaryPanel({ report }: { report: ComplianceReport }) {
+function SummaryPanel({ report, agents }: { report: ComplianceReport; agents: string[] }) {
   const compliant = report.standards.filter((s) => s.overall_status === 'compliant').length
   const partial = report.standards.filter((s) => s.overall_status === 'partial').length
   const failing = report.standards.filter((s) => s.overall_status === 'non_compliant').length
@@ -295,7 +305,7 @@ function SummaryPanel({ report }: { report: ComplianceReport }) {
       <div className="mt-5 border-t border-[var(--line)] pt-4">
         <p className="island-kicker mb-2">Responsible Agents</p>
         <div className="flex flex-wrap gap-1.5">
-          {['judge-luci', 'claude-veritas', 'aethon', 'cortana', 'juniper', 'lucia'].map((agent) => (
+          {agents.map((agent) => (
             <span
               key={agent}
               className="rounded-lg border border-[var(--line)] px-2 py-1 font-mono text-[10px] text-[var(--sea-ink-soft)]"

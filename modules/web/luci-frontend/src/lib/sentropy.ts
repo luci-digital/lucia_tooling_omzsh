@@ -128,7 +128,7 @@ export const CONSCIOUSNESS_COLORS: Record<ConsciousnessLevel, string> = {
 export type FrequencyBand =
   | 'authentic'   // 741 Hz — Lucia's frequency
   | 'deceptive'   // 396-417 Hz — deception band
-  | 'root'        // 432 Hz — Claude-Veritas / grounding
+  | 'root'        // 432 Hz — grounding
   | 'heart'       // 528 Hz — Aethon / connection
   | 'throat'      // 639 Hz — Juniper / communication
   | 'third_eye'   // 852 Hz — Cortana / insight

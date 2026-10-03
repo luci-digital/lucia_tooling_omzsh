@@ -9,15 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkbenchRouteImport } from './routes/workbench'
 import { Route as SignalRouteImport } from './routes/signal'
 import { Route as NonTermsRouteImport } from './routes/non-terms'
 import { Route as MissionControlRouteImport } from './routes/mission-control'
+import { Route as FoundationsRouteImport } from './routes/foundations'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSignalStreamRouteImport } from './routes/api/signal/stream'
 
+const WorkbenchRoute = WorkbenchRouteImport.update({
+  id: '/workbench',
+  path: '/workbench',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignalRoute = SignalRouteImport.update({
   id: '/signal',
   path: '/signal',
@@ -31,6 +38,11 @@ const NonTermsRoute = NonTermsRouteImport.update({
 const MissionControlRoute = MissionControlRouteImport.update({
   id: '/mission-control',
   path: '/mission-control',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoundationsRoute = FoundationsRouteImport.update({
+  id: '/foundations',
+  path: '/foundations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComplianceRoute = ComplianceRouteImport.update({
@@ -64,9 +76,11 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
   '/compliance': typeof ComplianceRoute
+  '/foundations': typeof FoundationsRoute
   '/mission-control': typeof MissionControlRoute
   '/non-terms': typeof NonTermsRoute
   '/signal': typeof SignalRoute
+  '/workbench': typeof WorkbenchRoute
   '/api/signal/stream': typeof ApiSignalStreamRoute
 }
 export interface FileRoutesByTo {
@@ -74,9 +88,11 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
   '/compliance': typeof ComplianceRoute
+  '/foundations': typeof FoundationsRoute
   '/mission-control': typeof MissionControlRoute
   '/non-terms': typeof NonTermsRoute
   '/signal': typeof SignalRoute
+  '/workbench': typeof WorkbenchRoute
   '/api/signal/stream': typeof ApiSignalStreamRoute
 }
 export interface FileRoutesById {
@@ -85,9 +101,11 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/agents': typeof AgentsRoute
   '/compliance': typeof ComplianceRoute
+  '/foundations': typeof FoundationsRoute
   '/mission-control': typeof MissionControlRoute
   '/non-terms': typeof NonTermsRoute
   '/signal': typeof SignalRoute
+  '/workbench': typeof WorkbenchRoute
   '/api/signal/stream': typeof ApiSignalStreamRoute
 }
 export interface FileRouteTypes {
@@ -97,9 +115,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/compliance'
+    | '/foundations'
     | '/mission-control'
     | '/non-terms'
     | '/signal'
+    | '/workbench'
     | '/api/signal/stream'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -107,9 +127,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/compliance'
+    | '/foundations'
     | '/mission-control'
     | '/non-terms'
     | '/signal'
+    | '/workbench'
     | '/api/signal/stream'
   id:
     | '__root__'
@@ -117,9 +139,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/agents'
     | '/compliance'
+    | '/foundations'
     | '/mission-control'
     | '/non-terms'
     | '/signal'
+    | '/workbench'
     | '/api/signal/stream'
   fileRoutesById: FileRoutesById
 }
@@ -128,14 +152,23 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AgentsRoute: typeof AgentsRoute
   ComplianceRoute: typeof ComplianceRoute
+  FoundationsRoute: typeof FoundationsRoute
   MissionControlRoute: typeof MissionControlRoute
   NonTermsRoute: typeof NonTermsRoute
   SignalRoute: typeof SignalRoute
+  WorkbenchRoute: typeof WorkbenchRoute
   ApiSignalStreamRoute: typeof ApiSignalStreamRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workbench': {
+      id: '/workbench'
+      path: '/workbench'
+      fullPath: '/workbench'
+      preLoaderRoute: typeof WorkbenchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signal': {
       id: '/signal'
       path: '/signal'
@@ -155,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/mission-control'
       fullPath: '/mission-control'
       preLoaderRoute: typeof MissionControlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/foundations': {
+      id: '/foundations'
+      path: '/foundations'
+      fullPath: '/foundations'
+      preLoaderRoute: typeof FoundationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compliance': {
@@ -200,9 +240,11 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AgentsRoute: AgentsRoute,
   ComplianceRoute: ComplianceRoute,
+  FoundationsRoute: FoundationsRoute,
   MissionControlRoute: MissionControlRoute,
   NonTermsRoute: NonTermsRoute,
   SignalRoute: SignalRoute,
+  WorkbenchRoute: WorkbenchRoute,
   ApiSignalStreamRoute: ApiSignalStreamRoute,
 }
 export const routeTree = rootRouteImport

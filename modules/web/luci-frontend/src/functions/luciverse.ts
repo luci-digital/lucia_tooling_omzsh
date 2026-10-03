@@ -4,6 +4,9 @@ import {
   thisTier,
   thisFrequency,
   thisCoherence,
+  primeLuciverseCatalog,
+  getAgentRegistry,
+  getLuciverseCatalog,
   type SubstrateStatus,
   type AgentProfile,
   type ChatMessage,
@@ -15,7 +18,9 @@ import {
 
 export const getSubstrateStatus = createServerFn({ method: 'GET' }).handler(
   async (): Promise<SubstrateStatus> => {
+    await primeLuciverseCatalog()
     const base = oasisEndpoint()
+    const catalog = getLuciverseCatalog()
 
     try {
       const res = await fetch(`${base}/status`, {
@@ -35,16 +40,7 @@ export const getSubstrateStatus = createServerFn({ method: 'GET' }).handler(
       frequency: thisFrequency(),
       tier: thisTier() as Tier,
       coherence: thisCoherence(),
-      modules: {
-        enzyme_collapse: true,
-        state_machine: true,
-        filter_membrane: true,
-        humo: true,
-        signal_bus: true,
-        genesis_bond: true,
-        nebula: false,
-        luci_glyph: true,
-      },
+      modules: catalog.substrate.modules,
       uptime_seconds: 0,
     }
   },
@@ -54,6 +50,7 @@ export const getSubstrateStatus = createServerFn({ method: 'GET' }).handler(
 
 export const listAgents = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AgentProfile[]> => {
+    await primeLuciverseCatalog()
     const base = oasisEndpoint()
 
     try {
@@ -67,16 +64,7 @@ export const listAgents = createServerFn({ method: 'GET' }).handler(
       // Fall through to stub
     }
 
-    // Full Luciverse agent registry from calibration.ini + agent-rules.md
-    return [
-      { id: 'lucia',         title: 'Lucia (741 Hz Orchestrator)', service: 'Anthropic', frequency: 741 },
-      { id: 'judge-luci',    title: 'Judge Luci (963 Hz Crown)',    service: 'Anthropic', frequency: 963 },
-      { id: 'juniper',       title: 'Juniper (639 Hz Throat)',      service: 'Ollama',    frequency: 639 },
-      { id: 'cortana',       title: 'Cortana (852 Hz Third Eye)',   service: 'Ollama',    frequency: 852 },
-      { id: 'claude-veritas', title: 'Claude Veritas (432 Hz Truth)', service: 'Anthropic', frequency: 432 },
-      { id: 'aethon',        title: 'Aethon (528 Hz Heart)',        service: 'Ollama',    frequency: 528 },
-      { id: 'pinky',         title: 'Pinky (111 Hz Vanguard)',      service: 'Ollama',    frequency: 111 },
-    ]
+    return getAgentRegistry()
   },
 )
 
@@ -112,15 +100,18 @@ export const chatWithAgent = createServerFn({ method: 'POST' })
 
 export const getSignalBusStatus = createServerFn({ method: 'GET' }).handler(
   async () => {
+    await primeLuciverseCatalog()
+    const catalog = getLuciverseCatalog()
     const host = process.env['REDIS_HOST'] ?? '127.0.0.1'
     const port = process.env['REDIS_PORT'] ?? '6379'
     const channel = process.env['SIGNAL_CHANNEL'] ?? 'luci:signal'
+    const frequency = thisFrequency()
     return {
-      redis_host: host,
-      redis_port: port,
-      broadcast_channel: `${channel}:broadcast`,
-      signal_count: 16,
-      genesis_bond: 'ACTIVE @ 741 Hz',
+      redis_host: catalog.endpoints.redis_host ?? host,
+      redis_port: catalog.endpoints.redis_port ?? port,
+      broadcast_channel: `${catalog.endpoints.signal_channel ?? channel}:broadcast`,
+      signal_count: catalog.signals.length,
+      genesis_bond: `ACTIVE @ ${frequency} Hz`,
     }
   },
 )
