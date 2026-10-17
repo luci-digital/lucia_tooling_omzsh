@@ -127,14 +127,14 @@ impl AgentWorkflow {
         self
     }
 
-    /// Serialise the workflow to DAG-JSON and compute its BLAKE3 CID.
-    /// In production this would use the `cid` crate with multihash;
-    /// here we return a BLAKE3 hex as a stable content address.
+    /// Serialise the workflow to JSON and compute its CIDv1 (json 0x0200, BLAKE3 0x1e).
+    /// The bytes are serde_json output in struct-field order — deterministic, but NOT
+    /// canonical DAG-JSON, so the codec is plain `json`, never `dag-json`.
     #[instrument(skip(self), fields(name = %self.name, tasks = self.tasks.len()))]
     pub fn content_address(&self) -> anyhow::Result<String> {
         let json = serde_json::to_vec(self)?;
         let hash = blake3::hash(&json);
-        Ok(format!("bafk-blake3-{}", hex::encode(hash.as_bytes())))
+        Ok(crate::cid::cid_v1_blake3(crate::cid::JSON, hash.as_bytes()))
     }
 
     /// Validate: every agent in the workflow operates at or below
@@ -168,7 +168,9 @@ mod tests {
         let cid1 = wf.content_address().unwrap();
         let cid2 = wf.content_address().unwrap();
         assert_eq!(cid1, cid2, "CID must be deterministic");
-        assert!(cid1.starts_with("bafk-blake3-"));
+        let (codec, digest) = crate::cid::decode_cid_v1_blake3(&cid1).expect("a real CIDv1");
+        assert_eq!(codec, crate::cid::JSON);
+        assert_eq!(&digest, blake3::hash(&serde_json::to_vec(&wf).unwrap()).as_bytes());
     }
 
     #[test]

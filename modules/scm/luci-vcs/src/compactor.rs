@@ -9,6 +9,7 @@
 // Orphan detection: scan workflows/index.json for referenced CIDs,
 // GC everything else (respecting retention policy).
 
+use crate::block_cache::BlockAddr;
 use crate::metrics::MetricsCollector;
 use crate::retention::RetentionPolicy;
 use crate::wal::{OpType, WalManager};
@@ -118,6 +119,13 @@ impl Compactor {
             return Ok(stats);
         }
 
+        // References may be spelled as a real CIDv1, the legacy `bafk-blake3-<hex>`, or bare hex.
+        // Compare addresses, not strings, so a block referenced in any spelling survives.
+        let referenced: HashSet<BlockAddr> = referenced_cids
+            .iter()
+            .filter_map(|s| BlockAddr::parse_ref(s))
+            .collect();
+
         for shard_entry in std::fs::read_dir(&self.objects_dir)? {
             let shard_entry = shard_entry?;
             if !shard_entry.file_type()?.is_dir() {
@@ -133,8 +141,15 @@ impl Compactor {
                     continue;
                 }
 
-                let cid = format!("bafk-blake3-{block_name}");
-                if !referenced_cids.contains(&cid) && !referenced_cids.contains(&block_name) {
+                // Never delete on doubt: a file whose name is not a 64-hex BLAKE3 address is not a
+                // block this cache wrote, so GC leaves it alone.
+                let Some(addr) = BlockAddr::parse_ref(&block_name).filter(|_| block_name.len() == 64)
+                else {
+                    warn!(file = %block_name, "non-address file in objects dir — kept");
+                    continue;
+                };
+
+                if !referenced.contains(&addr) && !referenced_cids.contains(&block_name) {
                     let size = block_entry.metadata()?.len();
                     std::fs::remove_file(block_entry.path())?;
                     stats.blocks_removed += 1;
@@ -232,7 +247,7 @@ pub fn load_referenced_cids(workflows_dir: impl AsRef<Path>) -> std::io::Result<
 fn collect_cids_from_value(value: &serde_json::Value, cids: &mut HashSet<String>) {
     match value {
         serde_json::Value::String(s) => {
-            if s.starts_with("bafk-") || s.len() == 64 {
+            if s.starts_with("bafk-") || s.len() == 64 || BlockAddr::parse_ref(s).is_some() {
                 cids.insert(s.clone());
             }
         }
@@ -315,6 +330,49 @@ mod tests {
         let compactor = Compactor::new(&objects_dir, RetentionPolicy::default());
         let stats = compactor.gc(&referenced).unwrap();
         assert_eq!(stats.blocks_removed, 0);
+    }
+
+    /// Regression guard for the CID format change: blocks referenced by a real CIDv1, by the
+    /// legacy `bafk-blake3-<hex>` spelling, and by bare hex must all survive GC; only the
+    /// unreferenced block goes, and a non-address file is never touched.
+    #[test]
+    fn gc_honours_every_reference_spelling() {
+        let dir = tempdir().unwrap();
+        let objects_dir = dir.path().join("objects");
+
+        let write_block = |data: &[u8]| {
+            let addr = BlockAddr::from_bytes(data);
+            let shard = objects_dir.join(addr.shard());
+            std::fs::create_dir_all(&shard).unwrap();
+            std::fs::write(shard.join(addr.to_hex()), data).unwrap();
+            addr
+        };
+        let by_cid = write_block(b"referenced-by-cidv1");
+        let by_legacy = write_block(b"referenced-by-legacy");
+        let by_hex = write_block(b"referenced-by-hex");
+        let orphan = write_block(b"orphan");
+        let stray_dir = objects_dir.join(by_cid.shard());
+        std::fs::write(stray_dir.join("notes.txt"), b"not a block").unwrap();
+
+        // References as they would be collected from workflow JSON on disk.
+        let index = serde_json::json!({
+            "a": by_cid.to_cid(),
+            "b": format!("bafk-blake3-{}", by_legacy.to_hex()),
+            "c": [by_hex.to_hex()],
+        });
+        let mut referenced = HashSet::new();
+        collect_cids_from_value(&index, &mut referenced);
+
+        let compactor = Compactor::new(&objects_dir, RetentionPolicy::default());
+        let stats = compactor.gc(&referenced).unwrap();
+        assert_eq!(stats.blocks_removed, 1);
+
+        let exists = |a: &BlockAddr| objects_dir.join(a.shard()).join(a.to_hex()).exists();
+        assert!(exists(&by_cid), "CIDv1-referenced block was deleted");
+        assert!(exists(&by_legacy), "legacy-referenced block was deleted");
+        assert!(exists(&by_hex), "hex-referenced block was deleted");
+        assert!(!exists(&orphan), "orphan block survived");
+        assert!(stray_dir.join("notes.txt").exists(), "non-address file was deleted");
     }
 
     #[test]

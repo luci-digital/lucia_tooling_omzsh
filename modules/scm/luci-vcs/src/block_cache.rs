@@ -40,6 +40,17 @@ impl BlockAddr {
         self.0.iter().map(|b| format!("{:02x}", b)).collect()
     }
 
+    /// CIDv1 (raw 0x55, BLAKE3 0x1e). The address hashes the uncompressed block bytes,
+    /// so `raw` is the honest codec.
+    pub fn to_cid(&self) -> String {
+        crate::cid::cid_v1_blake3(crate::cid::RAW, &self.0)
+    }
+
+    /// Resolve a reference — real CIDv1, legacy `bafk-blake3-<hex>`, or bare hex — to an address.
+    pub fn parse_ref(s: &str) -> Option<Self> {
+        crate::cid::parse_ref(s).map(Self)
+    }
+
     /// Shard prefix — first byte as hex, used as a directory to avoid huge
     /// flat directories on the CAS store.
     pub fn shard(&self) -> String {
